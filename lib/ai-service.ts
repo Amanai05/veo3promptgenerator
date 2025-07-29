@@ -25,6 +25,16 @@ interface ChatResponse {
   ideaText: string
 }
 
+interface Veo3PromptResponse {
+  jsonPrompt: string
+  paragraphPrompt: string
+  metadata: {
+    model: string
+    processingTime: number
+    fallbackUsed: boolean
+  }
+}
+
 class GeminiDirectAPI {
   private apiKey: string
   private baseUrl = "https://generativelanguage.googleapis.com/v1beta"
@@ -74,7 +84,7 @@ class GeminiDirectAPI {
       },
     }
 
-    const response = await this.makeRequest("/models/gemini-2.5-flash-exp:generateContent", data)
+    const response = await this.makeRequest("/models/gemini-2.5-flash:generateContent", data)
     return response.candidates[0]?.content?.parts[0]?.text || ""
   }
 }
@@ -136,7 +146,7 @@ class OpenRouterAPI {
     ]
 
     const data = {
-      model: "google/gemini-2.5-flash", // Changed from pro to flash for lower cost
+      model: "google/gemini-2.5-flash", // Updated to correct model name
       messages,
       max_tokens: 1200, // Reduced from 2048 to stay within credit limits
       temperature: 0.7,
@@ -155,11 +165,19 @@ export class AIService {
     const geminiKey = process.env.GEMINI_API_KEY
     const openRouterKey = process.env.OPENROUTER_API_KEY
 
-    if (geminiKey) {
+    console.log("🔧 AI Service Initialization:")
+    console.log("  - GEMINI_API_KEY:", geminiKey ? "✅ Set" : "❌ Missing")
+    console.log("  - OPENROUTER_API_KEY:", openRouterKey ? "✅ Set" : "❌ Missing")
+
+    if (geminiKey && geminiKey !== "your_gemini_api_key_here") {
       this.geminiDirect = new GeminiDirectAPI(geminiKey)
     }
-    if (openRouterKey) {
+    if (openRouterKey && openRouterKey !== "your_openrouter_api_key_here") {
       this.openRouter = new OpenRouterAPI(openRouterKey)
+    }
+
+    if (!this.geminiDirect && !this.openRouter) {
+      console.warn("⚠️ No API keys configured. AI features will not work.")
     }
   }
 
@@ -349,6 +367,169 @@ Keep response concise and accurate.`
           format: format,
         },
         fallbackUsed,
+      }
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error occurred",
+      }
+    }
+  }
+
+  async generateVeo3Prompt(formData: {
+    mainSubject: string
+    sceneAction: string
+    dialogue?: string
+    cameraMovement?: string
+    otherDetails?: string
+    subtitles?: string
+  }): Promise<AIResponse> {
+    const startTime = Date.now()
+    
+    const systemPrompt = `You are an expert Veo3 prompt engineer specializing in AI video generation. Your task is to create TWO formats of the same video prompt:
+
+1. JSON FORMAT: Structured data for technical AI processing
+2. PARAGRAPH FORMAT: Narrative description for creative AI processing
+
+USER INPUT:
+- Main Subject: ${formData.mainSubject}
+- Scene Action: ${formData.sceneAction}
+${formData.dialogue ? `- Dialogue: ${formData.dialogue}` : ''}
+${formData.cameraMovement ? `- Camera Movement: ${formData.cameraMovement}` : ''}
+${formData.otherDetails ? `- Additional Details: ${formData.otherDetails}` : ''}
+${formData.subtitles ? `- Subtitles: ${formData.subtitles}` : ''}
+
+REQUIREMENTS:
+- Optimize for Google's Veo3 AI video generation
+- Duration: 15-60 seconds
+- Quality: 4K resolution, 30fps
+- Professional cinematic quality
+
+OUTPUT FORMAT:
+Provide your response in this exact structure:
+
+===JSON FORMAT===
+{
+  "scene": "detailed scene description",
+  "subject": "main subject details",
+  "action": "specific actions and movements",
+  "camera": "camera angles and movements",
+  "lighting": "lighting setup and mood",
+  "audio": "sound effects and music",
+  "technical": {
+    "duration": "15-60 seconds",
+    "quality": "4K, 30fps",
+    "aspect_ratio": "16:9",
+    "style": "cinematic"
+  }
+}
+===END JSON===
+
+===PARAGRAPH FORMAT===
+[Write a detailed, cinematic paragraph describing the scene with all visual and audio elements, optimized for Veo3 AI generation]
+===END PARAGRAPH===
+
+Ensure both formats are comprehensive and ready for immediate use in Veo3.`
+
+    try {
+      // Check if any AI service is available
+      if (!this.geminiDirect && !this.openRouter) {
+        // Provide a fallback response for testing without API keys
+        console.warn("⚠️ No valid API keys configured. Using fallback response for testing.")
+        
+        const fallbackJson = `{
+  "scene": "A cinematic scene featuring ${formData.mainSubject}",
+  "subject": "${formData.mainSubject}",
+  "action": "${formData.sceneAction}",
+  "camera": "Professional camera work with smooth movements",
+  "lighting": "Cinematic lighting with dramatic shadows",
+  "audio": "Background music appropriate to the scene mood",
+  "technical": {
+    "duration": "15-60 seconds",
+    "quality": "4K, 30fps",
+    "aspect_ratio": "16:9",
+    "style": "cinematic"
+  }
+}`
+
+        const fallbackParagraph = `Create a cinematic video scene featuring ${formData.mainSubject}. The scene should depict ${formData.sceneAction} with professional camera work, cinematic lighting, and appropriate background music. The video should be 15-60 seconds in duration, shot in 4K resolution at 30fps, with a 16:9 aspect ratio and cinematic style.${formData.dialogue ? ` Include dialogue: ${formData.dialogue}.` : ''}${formData.cameraMovement ? ` Use camera movement: ${formData.cameraMovement}.` : ''}${formData.otherDetails ? ` Additional details: ${formData.otherDetails}.` : ''}${formData.subtitles ? ` Include subtitles: ${formData.subtitles}.` : ''}`
+
+        return {
+          success: true,
+          data: {
+            jsonPrompt: fallbackJson,
+            paragraphPrompt: fallbackParagraph,
+            metadata: {
+              model: "fallback",
+              processingTime: 0,
+              fallbackUsed: true
+            }
+          },
+          fallbackUsed: true
+        }
+      }
+
+      const { result, fallbackUsed } = await this.tryWithFallback(
+        () => this.geminiDirect!.generateContent(systemPrompt),
+        this.openRouter ? () => this.openRouter!.generateContent(systemPrompt) : undefined,
+      )
+
+      // Parse the response to extract JSON and paragraph formats
+      const jsonMatch = result.match(/===JSON FORMAT===\s*([\s\S]*?)\s*===END JSON===/)
+      const paragraphMatch = result.match(/===PARAGRAPH FORMAT===\s*([\s\S]*?)\s*===END PARAGRAPH===/)
+
+      let jsonPrompt = jsonMatch ? jsonMatch[1].trim() : null
+      let paragraphPrompt = paragraphMatch ? paragraphMatch[1].trim() : null
+
+      // If parsing failed, try to extract JSON from the response
+      if (!jsonPrompt) {
+        try {
+          // Look for JSON-like content in the response
+          const jsonStart = result.indexOf('{')
+          const jsonEnd = result.lastIndexOf('}') + 1
+          if (jsonStart !== -1 && jsonEnd > jsonStart) {
+            const potentialJson = result.substring(jsonStart, jsonEnd)
+            JSON.parse(potentialJson) // Test if it's valid JSON
+            jsonPrompt = potentialJson
+          }
+        } catch (e) {
+          // If no valid JSON found, create a fallback
+          jsonPrompt = `{
+  "scene": "A cinematic scene featuring ${formData.mainSubject}",
+  "subject": "${formData.mainSubject}",
+  "action": "${formData.sceneAction}",
+  "camera": "Professional camera work",
+  "lighting": "Cinematic lighting",
+  "audio": "Background music",
+  "technical": {
+    "duration": "15-60 seconds",
+    "quality": "4K, 30fps",
+    "aspect_ratio": "16:9",
+    "style": "cinematic"
+  }
+}`
+        }
+      }
+
+      // If paragraph parsing failed, use the full response
+      if (!paragraphPrompt) {
+        paragraphPrompt = result
+      }
+
+      const processingTime = Date.now() - startTime
+
+      return {
+        success: true,
+        data: {
+          jsonPrompt,
+          paragraphPrompt,
+          metadata: {
+            model: fallbackUsed ? "openrouter/gemini-2.5-flash" : "gemini-2.5-flash",
+            processingTime,
+            fallbackUsed
+          }
+        },
+        fallbackUsed
       }
     } catch (error) {
       return {

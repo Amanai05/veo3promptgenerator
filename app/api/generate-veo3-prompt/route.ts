@@ -1,69 +1,51 @@
 import { type NextRequest, NextResponse } from "next/server"
+import { aiService } from "@/lib/ai-service"
 
 export async function POST(request: NextRequest) {
   try {
-    const { context, characters } = await request.json()
+    const formData = await request.json()
 
-    if (!context?.trim()) {
-      return NextResponse.json({ error: "Context is required" }, { status: 400 })
+    // Validate required fields
+    if (!formData.mainSubject?.trim() || !formData.sceneAction?.trim()) {
+      return NextResponse.json(
+        { error: "Main subject and scene action are required. Please fill in the context/description field." }, 
+        { status: 400 }
+      )
     }
 
-    // Simulate AI processing delay
-    await new Promise((resolve) => setTimeout(resolve, 2000))
+    // Clean and validate input data
+    const cleanedData = {
+      mainSubject: formData.mainSubject.trim(),
+      sceneAction: formData.sceneAction.trim(),
+      dialogue: formData.dialogue?.trim() || undefined,
+      cameraMovement: formData.cameraMovement?.trim() || undefined,
+      otherDetails: formData.otherDetails?.trim() || undefined,
+      subtitles: formData.subtitles || undefined
+    }
 
-    // Generate a comprehensive Veo3 prompt
-    const characterDescriptions = characters
-      .filter((char: any) => char.name?.trim())
-      .map((char: any) => {
-        let desc = `${char.name}`
-        if (char.description?.trim()) {
-          desc += ` - ${char.description}`
-        }
-        if (char.voice?.trim()) {
-          desc += ` (Voice: ${char.voice})`
-        }
-        return desc
-      })
-      .join("; ")
+    // Generate Veo3 prompt using AI service
+    const aiResponse = await aiService.generateVeo3Prompt(cleanedData)
 
-    const prompt = `CONTEXT: ${context}
+    if (!aiResponse.success) {
+      console.error("AI service error:", aiResponse.error)
+      return NextResponse.json(
+        { error: "Failed to generate prompt. Please try again." }, 
+        { status: 500 }
+      )
+    }
 
-${characterDescriptions ? `CHARACTERS: ${characterDescriptions}` : ""}
+    return NextResponse.json({
+      success: true,
+      jsonPrompt: aiResponse.data.jsonPrompt,
+      paragraphPrompt: aiResponse.data.paragraphPrompt,
+      metadata: aiResponse.data.metadata
+    })
 
-GENERATED VEO3 PROMPT:
-Create a cinematic video scene based on the provided context. The scene should capture the atmospheric details of the setting while maintaining visual coherence and emotional resonance. 
-
-Visual Elements:
-- Establish the mood and atmosphere described in the context
-- Use appropriate lighting to enhance the scene's emotional tone
-- Incorporate environmental details that support the narrative
-- Ensure smooth camera movements that complement the story
-
-${
-  characterDescriptions
-    ? `Character Direction:
-${characters
-  .filter((char: any) => char.name?.trim())
-  .map(
-    (char: any) =>
-      `- ${char.name}: ${char.description || "Detailed character appearance and mannerisms"}${char.voice ? ` with ${char.voice}` : ""}`,
-  )
-  .join("\n")}`
-    : ""
-}
-
-Technical Specifications:
-- Duration: 30-60 seconds
-- Resolution: 1080p minimum
-- Frame rate: 24fps for cinematic feel
-- Color grading: Match the mood of the scene
-- Audio: Ambient sounds appropriate to the setting
-
-This prompt is optimized for Google's Veo3 AI video generation system and includes all necessary elements for high-quality video output.`
-
-    return NextResponse.json({ prompt })
   } catch (error) {
-    console.error("Error generating Veo3 prompt:", error)
-    return NextResponse.json({ error: "Failed to generate prompt" }, { status: 500 })
+    console.error("Error in generate-veo3-prompt:", error)
+    return NextResponse.json(
+      { error: "Internal server error" }, 
+      { status: 500 }
+    )
   }
 }

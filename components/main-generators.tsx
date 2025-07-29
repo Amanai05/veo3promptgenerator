@@ -142,6 +142,20 @@ export function MainGenerators() {
       return
     }
 
+    // Map the old structure to new API format
+    const formData = {
+      mainSubject: context.trim(),
+      sceneAction: context.trim(), // Using context for both since this component doesn't have separate scene action
+      dialogue: characters.map(char => 
+        char.voice ? `${char.name}: ${char.voice}` : char.name
+      ).filter(Boolean).join("; "),
+      cameraMovement: undefined,
+      otherDetails: characters.map(char => 
+        char.description ? `${char.name} - ${char.description}` : char.name
+      ).filter(Boolean).join("; "),
+      subtitles: undefined
+    }
+
     setIsGenerating(true)
     setGeneratedContent("")
 
@@ -149,13 +163,28 @@ export function MainGenerators() {
       const response = await fetch("/api/generate-veo3-prompt", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ context, characters }),
+        body: JSON.stringify(formData),
       })
 
       const data = await response.json()
       if (!response.ok) throw new Error(data.error || "Failed to generate prompt")
 
-      setGeneratedContent(data.prompt)
+              console.log("API Response:", data) // Debug log
+
+        // Handle both old and new response formats
+        let prompt = "No prompt generated"
+
+        if (data.jsonPrompt && data.paragraphPrompt) {
+          // New dual format - store separately for dual-box display
+          prompt = `JSON:${data.jsonPrompt}|||PARAGRAPH:${data.paragraphPrompt}`
+        } else if (data.jsonPrompt) {
+          prompt = data.jsonPrompt
+        } else if (data.prompt) {
+          prompt = data.prompt
+        }
+
+        setGeneratedContent(prompt)
+      
       toast({
         title: "Prompt generated successfully!",
         description: "Your Veo3 prompt is ready.",
@@ -447,16 +476,99 @@ export function MainGenerators() {
 
           {/* Generated Content Output */}
           {generatedContent && (
-            <Card className="mt-6">
-              <CardHeader>
-                <CardTitle>Generated {activeTab === "video-script" ? "Script" : "Prompt"}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="bg-muted/50 rounded-lg p-4">
-                  <pre className="whitespace-pre-wrap text-sm leading-relaxed">{generatedContent}</pre>
-                </div>
-              </CardContent>
-            </Card>
+            <div className="mt-6 space-y-4">
+              {/* JSON Format Box */}
+              {generatedContent.includes('JSON:') && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center justify-between">
+                      <span className="flex items-center gap-2">
+                        <span className="text-lg">📋</span>
+                        JSON Format (Technical)
+                      </span>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={async () => {
+                          const jsonContent = generatedContent.split('JSON:')[1]?.split('|||')[0] || ''
+                          await navigator.clipboard.writeText(jsonContent)
+                          toast({
+                            title: "Copied!",
+                            description: "JSON format copied to clipboard",
+                          })
+                        }}
+                        className="text-xs"
+                      >
+                        📋 Copy
+                      </Button>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 border">
+                      <pre className="whitespace-pre-wrap text-xs leading-relaxed font-mono text-gray-800 dark:text-gray-200 overflow-x-auto">
+                        {generatedContent.split('JSON:')[1]?.split('|||')[0] || ''}
+                      </pre>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      Use this structured format for technical AI processing and API integrations.
+                    </p>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Paragraph Format Box */}
+              {generatedContent.includes('PARAGRAPH:') && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center justify-between">
+                      <span className="flex items-center gap-2">
+                        <span className="text-lg">📝</span>
+                        Paragraph Format (Creative)
+                      </span>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={async () => {
+                          const paragraphContent = generatedContent.split('PARAGRAPH:')[1] || ''
+                          await navigator.clipboard.writeText(paragraphContent)
+                          toast({
+                            title: "Copied!",
+                            description: "Paragraph format copied to clipboard",
+                          })
+                        }}
+                        className="text-xs"
+                      >
+                        📋 Copy
+                      </Button>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-700">
+                      <pre className="whitespace-pre-wrap text-xs leading-relaxed text-gray-800 dark:text-gray-200">
+                        {generatedContent.split('PARAGRAPH:')[1] || ''}
+                      </pre>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      Use this narrative format for creative AI processing and storytelling.
+                    </p>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Fallback for old format */}
+              {!generatedContent.includes('JSON:') && !generatedContent.includes('PARAGRAPH:') && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Generated {activeTab === "video-script" ? "Script" : "Prompt"}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="bg-muted/50 rounded-lg p-4">
+                      <pre className="whitespace-pre-wrap text-xs leading-relaxed text-gray-800 dark:text-gray-200">{generatedContent}</pre>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
           )}
         </div>
       </div>

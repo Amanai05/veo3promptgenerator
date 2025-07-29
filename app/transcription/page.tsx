@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { useState, useCallback } from "react"
-import { Loader2, Upload, FileVideo, X, Download, Mic, Languages, Clock, Users } from "lucide-react"
+import { Loader2, Upload, FileVideo, X, Download, Mic, Languages, Clock, Users, Brain, Video } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import Link from "next/link"
 import { useDropzone } from "react-dropzone"
@@ -164,260 +164,240 @@ export default function TranscriptionPage() {
   ]
 
   return (
-    <main>
-      <section className="py-3 xs:py-4 sm:py-6 bg-background">
-        <div className="container mx-auto px-3 xs:px-4 sm:px-6 lg:px-8">
-          <div className="max-w-[720px] mx-auto">
-            {/* Headline with Accent Color */}
-            <h1 className="text-center text-xl xs:text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 xs:mb-3 px-2">
-              Video <span className="text-orange-600">Transcription</span>
-            </h1>
-            
-            {/* Description */}
-            <p className="text-gray-700 dark:text-gray-300 text-center mb-4 xs:mb-6 max-w-2xl mx-auto text-xs xs:text-sm sm:text-base px-3 xs:px-4">
-              Extract and transcribe audio from your videos with AI precision. Support for multiple languages and high accuracy transcription.
-            </p>
-            
-            {/* Navigation Tabs - Responsive Grid */}
-            <div className="flex justify-center mb-4 xs:mb-6 px-3 xs:px-4">
-              {/* Mobile: Stack vertically, Tablet+: 2x2 grid */}
-              <div className="w-full max-w-md">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 xs:gap-3">
-                  <Link href="/" className="w-full">
-                    <Button variant="outline" className="w-full h-10 xs:h-12 sm:h-14 text-xs xs:text-sm sm:text-base font-medium hover:bg-purple-600 hover:text-white hover:border-purple-600 transition-all duration-200 truncate">
-                      Veo3 Prompt Generator
-                    </Button>
-                  </Link>
-                  <Link href="/video-script-generator" className="w-full">
-                    <Button variant="outline" className="w-full h-10 xs:h-12 sm:h-14 text-xs xs:text-sm sm:text-base font-medium hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all duration-200 truncate">
-                      Video Script Generator
-                    </Button>
-                  </Link>
-                  <Link href="/video-to-prompt" className="w-full">
-                    <Button variant="outline" className="w-full h-10 xs:h-12 sm:h-14 text-xs xs:text-sm sm:text-base font-medium hover:bg-green-600 hover:text-white hover:border-green-600 transition-all duration-200 truncate">
-                      Video to Prompt Generator
-                    </Button>
-                  </Link>
-                  <Button className="w-full h-10 xs:h-12 sm:h-14 text-xs xs:text-sm sm:text-base font-medium bg-orange-600 hover:bg-orange-700 text-white truncate">
-                    Video Transcription
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+      <div className="max-w-[720px] mx-auto px-2 xs:px-3 sm:px-4">
+        {/* Headline with Accent Color */}
+        <h1 className="text-center text-xl xs:text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 xs:mb-3 px-1">
+          Video Transcription <span className="text-orange-600">Free Online</span>
+        </h1>
+
+        {/* Description */}
+        <p className="text-gray-700 dark:text-gray-300 text-center mb-4 xs:mb-6 max-w-2xl mx-auto text-sm xs:text-base px-2">
+          Convert your video audio into accurate text transcriptions. Support for 14+ languages with automatic detection and timestamps.
+        </p>
+
+        {/* Navigation Tabs */}
+        <div className="mb-6 xs:mb-8 px-1">
+          <div className="w-full max-w-md mx-auto">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 xs:gap-3">
+              <Link href="/" className="w-full">
+                <Button variant="outline" className="w-full h-10 xs:h-12 text-sm xs:text-base font-medium hover:bg-purple-600 hover:text-white hover:border-purple-600 transition-all duration-200 break-words">
+                  Veo3 Prompt Generator
+                </Button>
+              </Link>
+              <Link href="/video-script-generator" className="w-full">
+                <Button variant="outline" className="w-full h-10 xs:h-12 text-sm xs:text-base font-medium hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all duration-200 break-words">
+                  Video Script Generator
+                </Button>
+              </Link>
+              <Link href="/video-to-prompt" className="w-full">
+                <Button variant="outline" className="w-full h-10 xs:h-12 text-sm xs:text-base font-medium hover:bg-green-600 hover:text-white hover:border-green-600 transition-all duration-200 break-words">
+                  Video to Prompt Generator
+                </Button>
+              </Link>
+              <Button className="w-full h-10 xs:h-12 text-sm xs:text-base font-medium bg-orange-600 hover:bg-orange-700 text-white break-words">
+                Video Transcription
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {/* Main Form Card */}
+        <Card className="shadow-lg bg-white dark:bg-gray-800 mb-6 xs:mb-8 mx-1 xs:mx-2 sm:mx-0 rounded-lg">
+          <CardContent className="p-4 xs:p-5 sm:p-6">
+            {/* Video Upload Section */}
+            <div className="mb-4 xs:mb-6">
+              <label className="text-sm xs:text-base font-bold mb-2 block">Upload Video:</label>
+              <div
+                {...getRootProps()}
+                className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${
+                  isDragActive
+                    ? "border-orange-500 bg-orange-50 dark:bg-orange-950/20"
+                    : "border-gray-300 dark:border-gray-600 hover:border-orange-500 dark:hover:border-orange-500"
+                }`}
+              >
+                <input {...getInputProps()} />
+                <Upload className="mx-auto h-8 w-8 text-gray-400 mb-2" />
+                <p className="text-sm xs:text-base text-gray-600 dark:text-gray-400">
+                  {isDragActive ? "Drop the video here..." : "Drag & drop a video file here, or click to select"}
+                </p>
+                <p className="text-xs text-gray-500 mt-1">Supports MP4, MOV, AVI (Max 100MB)</p>
+              </div>
+            </div>
+
+            {/* Uploaded Video Display */}
+            {uploadedVideo && (
+              <div className="mb-4 xs:mb-6 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <Video className="h-4 w-4 text-orange-600" />
+                    <span className="text-sm xs:text-base font-medium">{uploadedVideo.name}</span>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setUploadedVideo(null)}
+                    className="text-red-600 hover:text-red-700 h-8 px-2"
+                  >
+                    <X className="h-4 w-4" />
                   </Button>
                 </div>
               </div>
-            </div>
-            
-            {/* Main Form Card */}
-            <Card className="shadow-lg bg-white dark:bg-gray-800 mb-6 xs:mb-8 mx-3 xs:mx-4 sm:mx-0">
-              <CardContent className="p-3 xs:p-4 sm:p-6">
-                {/* Video Upload Section */}
-                <div className="mb-4 xs:mb-6">
-                  <label className="text-xs xs:text-sm sm:text-base font-bold mb-2 block">
-                    Upload Your Video
-                  </label>
-                  
-                  {!uploadedVideo ? (
-                    <div
-                      {...getRootProps()}
-                      className={`border-2 border-dashed rounded-lg p-4 xs:p-6 sm:p-8 text-center cursor-pointer transition-colors ${
-                        isDragActive 
-                          ? 'border-orange-500 bg-orange-50 dark:bg-orange-900/20' 
-                          : 'border-gray-300 dark:border-gray-600 hover:border-orange-400'
-                      }`}
-                    >
-                      <input {...getInputProps()} />
-                      <Upload className="h-8 w-8 xs:h-10 xs:w-10 sm:h-12 sm:w-12 mx-auto mb-2 xs:mb-4 text-gray-400" />
-                      {isDragActive ? (
-                        <p className="text-orange-600 font-medium text-sm xs:text-base">Drop the video here...</p>
-                      ) : (
-                        <div>
-                          <p className="text-sm xs:text-base sm:text-lg font-medium mb-1 xs:mb-2">Drag & drop your video here</p>
-                          <p className="text-xs xs:text-sm text-gray-500 mb-2 xs:mb-4">or click to browse files</p>
-                          <p className="text-xs text-gray-400">
-                            Supports: MP4, AVI, MOV, WMV, FLV, WebM (Max 100MB)
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    <div className="border border-gray-200 dark:border-gray-600 rounded-lg p-3 xs:p-4">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-2 xs:space-x-3">
-                          <FileVideo className="h-5 w-5 xs:h-6 xs:w-6 text-orange-600" />
-                          <div>
-                            <p className="text-sm xs:text-base font-medium truncate">{uploadedVideo.name}</p>
-                            <p className="text-xs text-gray-500">
-                              {(uploadedVideo.size / (1024 * 1024)).toFixed(2)} MB
-                            </p>
-                          </div>
-                        </div>
-                        <Button
-                          onClick={removeVideo}
-                          variant="ghost"
-                          size="sm"
-                          className="text-red-600 hover:text-red-700 h-8 w-8 xs:h-10 xs:w-10 p-0"
-                        >
-                          <X className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  )}
-                </div>
+            )}
 
-                {/* Language Selection */}
-                <div className="mb-4 xs:mb-6">
-                  <label className="text-xs xs:text-sm sm:text-base font-bold mb-2 block">
-                    Language
-                  </label>
-                  <Select value={language} onValueChange={setLanguage}>
-                    <SelectTrigger className="text-xs xs:text-sm sm:text-base">
-                      <SelectValue placeholder="Select language" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {languages.map((lang) => (
-                        <SelectItem key={lang.value} value={lang.value}>
-                          {lang.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Action Buttons */}
-                <div className="flex flex-col sm:flex-row gap-2 xs:gap-3">
-                  <Button
-                    onClick={transcribeVideo}
-                    disabled={isTranscribing || !uploadedVideo}
-                    className="flex-1 bg-orange-600 hover:bg-orange-700 text-white h-10 xs:h-12 sm:h-14 text-xs xs:text-sm sm:text-base font-medium"
-                  >
-                    {isTranscribing ? (
-                      <>
-                        <Loader2 className="h-3 w-3 xs:h-4 xs:w-4 sm:h-5 sm:w-5 mr-1 xs:mr-2 animate-spin" />
-                        Transcribing...
-                      </>
-                    ) : (
-                      <>
-                        <Mic className="h-3 w-3 xs:h-4 xs:w-4 sm:h-5 sm:w-5 mr-1 xs:mr-2" />
-                        Transcribe Video
-                      </>
-                    )}
-                  </Button>
-                  <Button
-                    onClick={clearAll}
-                    variant="outline"
-                    className="h-10 xs:h-12 sm:h-14 px-4 xs:px-6 text-xs xs:text-sm sm:text-base"
-                    disabled={isTranscribing || (!uploadedVideo && !transcription)}
-                  >
-                    Reset
-                  </Button>
-                </div>
-
-                {/* Result Container */}
-                {transcription && (
-                  <div className="mt-4 xs:mt-6 p-3 xs:p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                    <div className="flex justify-between items-center mb-2">
-                      <h4 className="font-bold text-xs xs:text-sm sm:text-base">Transcription:</h4>
-                      <Button
-                        onClick={downloadTranscription}
-                        variant="outline"
-                        size="sm"
-                        className="h-7 xs:h-8 px-2 xs:px-3 text-xs"
-                      >
-                        <Download className="h-3 w-3 xs:h-4 xs:w-4 mr-1" />
-                        Download
-                      </Button>
-                    </div>
-                    <pre className="whitespace-pre-wrap text-xs xs:text-sm sm:text-base overflow-x-auto">{transcription}</pre>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* How Video Transcription Works */}
-            <Card className="shadow-lg bg-white dark:bg-gray-800 mb-6 xs:mb-8 mx-3 xs:mx-4 sm:mx-0">
-              <CardHeader>
-                <CardTitle className="text-lg xs:text-xl sm:text-2xl font-bold text-orange-600 flex items-center gap-2">
-                  <Mic className="h-5 w-5 xs:h-6 xs:w-6" />
-                  How Video Transcription Works
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4 xs:space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 xs:gap-6">
-                  <div className="space-y-3 xs:space-y-4">
-                    <div className="flex items-start gap-3">
-                      <div className="w-8 h-8 xs:w-10 xs:h-10 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <Languages className="h-4 w-4 xs:h-5 xs:w-5 text-orange-600" />
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-sm xs:text-base">Multi-Language Support</h4>
-                        <p className="text-xs xs:text-sm text-muted-foreground">Supports 14+ languages with automatic language detection for accurate transcription.</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <div className="w-8 h-8 xs:w-10 xs:h-10 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <Clock className="h-4 w-4 xs:h-5 xs:w-5 text-orange-600" />
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-sm xs:text-base">Timestamp Support</h4>
-                        <p className="text-xs xs:text-sm text-muted-foreground">Includes timestamps for each segment to help navigate and reference specific parts.</p>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="space-y-3 xs:space-y-4">
-                    <div className="flex items-start gap-3">
-                      <div className="w-8 h-8 xs:w-10 xs:h-10 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <Users className="h-4 w-4 xs:h-5 xs:w-5 text-orange-600" />
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-sm xs:text-base">High Accuracy</h4>
-                        <p className="text-xs xs:text-sm text-muted-foreground">Achieves 95%+ accuracy with clear audio, adapting to different speakers and accents.</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <div className="w-8 h-8 xs:w-10 xs:h-10 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <Download className="h-4 w-4 xs:h-5 xs:w-5 text-orange-600" />
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-sm xs:text-base">Easy Export</h4>
-                        <p className="text-xs xs:text-sm text-muted-foreground">Download transcriptions as text files for use in subtitles, content analysis, or documentation.</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Simple Paragraph About the Tool */}
-            <Card className="shadow-lg bg-white dark:bg-gray-800 mb-6 xs:mb-8 mx-3 xs:mx-4 sm:mx-0">
-              <CardContent className="p-4 xs:p-6">
-                <h3 className="text-lg xs:text-xl font-bold mb-3 xs:mb-4 text-orange-600">About Video Transcription</h3>
-                <p className="text-sm xs:text-base text-gray-700 dark:text-gray-300 leading-relaxed">
-                  Our Video Transcription tool is a powerful AI-powered solution that extracts and converts audio from your videos into accurate text transcriptions. Supporting 14+ languages with automatic detection, this tool is perfect for content creators, businesses, educators, and anyone who needs to convert video content into searchable, accessible text. The transcription includes timestamps for easy navigation and can be downloaded for use in subtitles, content analysis, or documentation purposes.
-                </p>
-              </CardContent>
-            </Card>
-
-            {/* FAQ Section */}
-            <Card className="shadow-lg bg-white dark:bg-gray-800 mx-3 xs:mx-4 sm:mx-0">
-              <CardHeader>
-                <CardTitle className="text-lg xs:text-xl sm:text-2xl font-bold text-orange-600">Frequently Asked Questions</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Accordion type="single" collapsible className="w-full">
-                  {faqs.map((faq, index) => (
-                    <AccordionItem key={index} value={`item-${index}`}>
-                      <AccordionTrigger className="text-left text-xs xs:text-sm sm:text-base">
-                        {faq.question}
-                      </AccordionTrigger>
-                      <AccordionContent className="text-muted-foreground text-xs xs:text-sm sm:text-base">
-                        {faq.answer}
-                      </AccordionContent>
-                    </AccordionItem>
+            {/* Language Selection */}
+            <div className="mb-4 xs:mb-6">
+              <label className="text-sm xs:text-base font-bold mb-2 block">Language:</label>
+              <Select value={language} onValueChange={setLanguage}>
+                <SelectTrigger className="min-h-[48px] px-4 text-sm xs:text-base rounded-lg">
+                  <SelectValue placeholder="Select language" />
+                </SelectTrigger>
+                <SelectContent>
+                  {languages.map((lang) => (
+                    <SelectItem key={lang.value} value={lang.value}>
+                      {lang.label}
+                    </SelectItem>
                   ))}
-                </Accordion>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
-    </main>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex gap-3 xs:gap-4">
+              <Button
+                onClick={transcribeVideo}
+                disabled={isTranscribing || !uploadedVideo}
+                className="flex-1 bg-orange-600 hover:bg-orange-700 text-white h-10 xs:h-12 text-sm xs:text-base font-medium rounded-lg"
+              >
+                {isTranscribing ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Transcribing...
+                  </>
+                ) : (
+                  <>
+                    <Mic className="mr-2 h-4 w-4" />
+                    Transcribe Video
+                  </>
+                )}
+              </Button>
+              <Button
+                onClick={clearAll}
+                variant="outline"
+                className="h-10 xs:h-12 px-4 xs:px-6 text-sm xs:text-base rounded-lg"
+                disabled={isTranscribing || (!uploadedVideo && !transcription)}
+              >
+                Clear
+              </Button>
+            </div>
+
+            {/* Result Container */}
+            {transcription && (
+              <div className="mt-4 xs:mt-6 p-4 xs:p-5 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <div className="flex justify-between items-center mb-2">
+                  <h4 className="font-bold text-sm xs:text-base">Transcription:</h4>
+                  <Button
+                    onClick={downloadTranscription}
+                    variant="outline"
+                    size="sm"
+                    className="text-sm h-8 px-3"
+                  >
+                    <Download className="h-3 w-3 mr-1" />
+                    Download
+                  </Button>
+                </div>
+                <pre className="whitespace-pre-wrap text-sm xs:text-base overflow-x-auto">{transcription}</pre>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* How Video Transcription Works */}
+        <Card className="shadow-lg bg-white dark:bg-gray-800 mb-6 xs:mb-8 mx-1 xs:mx-2 sm:mx-0 rounded-lg">
+          <CardHeader>
+            <CardTitle className="text-lg xs:text-xl sm:text-2xl font-bold text-orange-600 flex items-center gap-2">
+              <Brain className="h-5 w-5" />
+              How Video Transcription Works
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-4 xs:p-5">
+            <div className="space-y-4">
+              <div className="flex items-start gap-3">
+                <div className="w-8 h-8 bg-orange-100 dark:bg-orange-900 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                  <span className="text-orange-600 font-bold text-sm">1</span>
+                </div>
+                <div>
+                  <h4 className="font-semibold text-sm xs:text-base mb-1">Upload Your Video</h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Upload any video file (MP4, MOV, AVI) up to 100MB. Our system will extract the audio for transcription.</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="w-8 h-8 bg-orange-100 dark:bg-orange-900 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                  <span className="text-orange-600 font-bold text-sm">2</span>
+                </div>
+                <div>
+                  <h4 className="font-semibold text-sm xs:text-base mb-1">AI Transcription</h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Our advanced AI transcribes the audio with high accuracy, supporting 14+ languages with automatic detection.</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="w-8 h-8 bg-orange-100 dark:bg-orange-900 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                  <span className="text-orange-600 font-bold text-sm">3</span>
+                </div>
+                <div>
+                  <h4 className="font-semibold text-sm xs:text-base mb-1">Download & Use</h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Get your transcription with timestamps. Download as text file for use in subtitles, content analysis, or documentation.</p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Simple Paragraph About the Tool */}
+        <Card className="shadow-lg bg-white dark:bg-gray-800 mb-6 xs:mb-8 mx-1 xs:mx-2 sm:mx-0 rounded-lg">
+          <CardContent className="p-4 xs:p-5">
+            <h3 className="text-lg xs:text-xl font-bold mb-3 xs:mb-4 text-orange-600">About Video Transcription</h3>
+            <p className="text-sm xs:text-base text-gray-700 dark:text-gray-300 leading-relaxed">
+              Our Video Transcription tool is a powerful AI-powered solution that extracts and converts audio from your videos into accurate text transcriptions. Supporting 14+ languages with automatic detection, this tool is perfect for content creators, businesses, educators, and anyone who needs to convert video content into searchable, accessible text. The transcription includes timestamps for easy navigation and can be downloaded for use in subtitles, content analysis, or documentation purposes.
+            </p>
+          </CardContent>
+        </Card>
+
+        {/* FAQ Section */}
+        <Card className="shadow-lg bg-white dark:bg-gray-800 mx-1 xs:mx-2 sm:mx-0 rounded-lg">
+          <CardHeader>
+            <CardTitle className="text-lg xs:text-xl sm:text-2xl font-bold text-orange-600">Frequently Asked Questions</CardTitle>
+          </CardHeader>
+          <CardContent className="p-4 xs:p-5">
+            <Accordion type="single" collapsible className="w-full">
+              <AccordionItem value="item-1">
+                <AccordionTrigger className="text-sm xs:text-base">What languages are supported?</AccordionTrigger>
+                <AccordionContent className="text-sm text-gray-600 dark:text-gray-400">
+                  We support 14+ languages including English, Spanish, French, German, Italian, Portuguese, Dutch, Russian, Chinese, Japanese, Korean, Arabic, Hindi, and more. The system automatically detects the language in your video.
+                </AccordionContent>
+              </AccordionItem>
+              <AccordionItem value="item-2">
+                <AccordionTrigger className="text-sm xs:text-base">How accurate is the transcription?</AccordionTrigger>
+                <AccordionContent className="text-sm text-gray-600 dark:text-gray-400">
+                  Our AI provides highly accurate transcriptions with industry-leading accuracy rates. The quality depends on audio clarity, background noise, and speaker pronunciation, but typically achieves 95%+ accuracy for clear audio.
+                </AccordionContent>
+              </AccordionItem>
+              <AccordionItem value="item-3">
+                <AccordionTrigger className="text-sm xs:text-base">Do you include timestamps?</AccordionTrigger>
+                <AccordionContent className="text-sm text-gray-600 dark:text-gray-400">
+                  Yes! All transcriptions include timestamps for easy navigation and reference. This makes it perfect for creating subtitles, finding specific moments in your video, or analyzing content structure.
+                </AccordionContent>
+              </AccordionItem>
+              <AccordionItem value="item-4">
+                <AccordionTrigger className="text-sm xs:text-base">Can I download the transcription?</AccordionTrigger>
+                <AccordionContent className="text-sm text-gray-600 dark:text-gray-400">
+                  Absolutely! You can download your transcription as a text file (.txt) with timestamps. This makes it easy to use in video editing software, create subtitles, or archive for future reference.
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
   )
 } 

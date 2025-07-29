@@ -1,41 +1,47 @@
 import { type NextRequest, NextResponse } from "next/server"
+import { aiService } from "@/lib/ai-service"
 
 export async function POST(request: NextRequest) {
   try {
     const { input } = await request.json()
 
-    if (!input || typeof input !== "string") {
-      return NextResponse.json({ error: "Invalid input provided" }, { status: 400 })
+    if (!input || typeof input !== "string" || !input.trim()) {
+      return NextResponse.json({ error: "Valid input description is required" }, { status: 400 })
     }
 
-    // Simulate AI processing for chat-style prompt generation
-    const prompt = `Based on your description: "${input}"
+    // Create form data structure from chat input
+    const formData = {
+      mainSubject: "From user description",
+      sceneAction: input.trim(),
+      dialogue: undefined,
+      cameraMovement: undefined,
+      otherDetails: undefined,
+      subtitles: undefined
+    }
 
-Here's a detailed video prompt for AI generation:
+    // Generate Veo3 prompt using AI service
+    const aiResponse = await aiService.generateVeo3Prompt(formData)
 
-SCENE: ${input}
+    if (!aiResponse.success) {
+      console.error("AI service error:", aiResponse.error)
+      return NextResponse.json(
+        { error: "Failed to generate prompt. Please try again." }, 
+        { status: 500 }
+      )
+    }
 
-TECHNICAL SPECIFICATIONS:
-- Duration: 15-30 seconds
-- Quality: 4K resolution
-- Frame rate: 30fps
-- Aspect ratio: Determined by platform requirements
+    return NextResponse.json({
+      success: true,
+      jsonPrompt: aiResponse.data.jsonPrompt,
+      paragraphPrompt: aiResponse.data.paragraphPrompt,
+      metadata: aiResponse.data.metadata
+    })
 
-VISUAL ELEMENTS:
-- Lighting: Professional, well-balanced
-- Camera work: Smooth, cinematic movements
-- Color grading: Enhanced for visual appeal
-
-AUDIO CONSIDERATIONS:
-- Background music: Appropriate to mood
-- Sound effects: Natural and immersive
-- Voice-over: Clear and engaging if applicable
-
-This prompt is optimized for AI video generation tools like Google's Veo 3.`
-
-    return NextResponse.json({ prompt })
   } catch (error) {
-    console.error("Error generating chat prompt:", error)
-    return NextResponse.json({ error: "Failed to generate prompt" }, { status: 500 })
+    console.error("Error in generate-chat-prompt:", error)
+    return NextResponse.json(
+      { error: "Internal server error" }, 
+      { status: 500 }
+    )
   }
 }

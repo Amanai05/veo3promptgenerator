@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { useState, useCallback } from "react"
-import { Loader2, Upload, FileVideo, X, Brain, Eye, Zap, Target } from "lucide-react"
+import { Loader2, Upload, FileVideo, X, Brain, Eye, Zap, Target, Video } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import Link from "next/link"
 import { useDropzone } from "react-dropzone"
@@ -124,230 +124,212 @@ export default function VideoToPromptPage() {
   ]
 
   return (
-    <main>
-      <section className="py-3 xs:py-4 sm:py-6 bg-background">
-        <div className="container mx-auto px-3 xs:px-4 sm:px-6 lg:px-8">
-          <div className="max-w-[720px] mx-auto">
-            {/* Headline with Accent Color */}
-            <h1 className="text-center text-xl xs:text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 xs:mb-3 px-2">
-              Video to <span className="text-green-600">Prompt Generator</span>
-            </h1>
-            
-            {/* Description */}
-            <p className="text-gray-700 dark:text-gray-300 text-center mb-4 xs:mb-6 max-w-2xl mx-auto text-xs xs:text-sm sm:text-base px-3 xs:px-4">
-              Upload your video and get detailed prompts for AI video generation. Analyze scenes, objects, and actions to create powerful prompts.
-            </p>
-            
-            {/* Navigation Tabs - Responsive Grid */}
-            <div className="flex justify-center mb-4 xs:mb-6 px-3 xs:px-4">
-              {/* Mobile: Stack vertically, Tablet+: 2x2 grid */}
-              <div className="w-full max-w-md">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 xs:gap-3">
-                  <Link href="/" className="w-full">
-                    <Button variant="outline" className="w-full h-10 xs:h-12 sm:h-14 text-xs xs:text-sm sm:text-base font-medium hover:bg-purple-600 hover:text-white hover:border-purple-600 transition-all duration-200 truncate">
-                      Veo3 Prompt Generator
-                    </Button>
-                  </Link>
-                  <Link href="/video-script-generator" className="w-full">
-                    <Button variant="outline" className="w-full h-10 xs:h-12 sm:h-14 text-xs xs:text-sm sm:text-base font-medium hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all duration-200 truncate">
-                      Video Script Generator
-                    </Button>
-                  </Link>
-                  <Button className="w-full h-10 xs:h-12 sm:h-14 text-xs xs:text-sm sm:text-base font-medium bg-green-600 hover:bg-green-700 text-white truncate">
-                    Video to Prompt Generator
-                  </Button>
-                  <Link href="/transcription" className="w-full">
-                    <Button variant="outline" className="w-full h-10 xs:h-12 sm:h-14 text-xs xs:text-sm sm:text-base font-medium hover:bg-orange-600 hover:text-white hover:border-orange-600 transition-all duration-200 truncate">
-                      Video Transcription
-                    </Button>
-                  </Link>
-                </div>
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-green-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+      <div className="max-w-[720px] mx-auto px-2 xs:px-3 sm:px-4">
+        {/* Headline with Accent Color */}
+        <h1 className="text-center text-xl xs:text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 xs:mb-3 px-1">
+          Video to Prompt Generator <span className="text-green-600">Free Online</span>
+        </h1>
+
+        {/* Description */}
+        <p className="text-gray-700 dark:text-gray-300 text-center mb-4 xs:mb-6 max-w-2xl mx-auto text-sm xs:text-base px-2">
+          Transform your existing videos into detailed AI prompts. Upload a video and get comprehensive prompts for AI video generation platforms.
+        </p>
+
+        {/* Navigation Tabs */}
+        <div className="mb-6 xs:mb-8 px-1">
+          <div className="w-full max-w-md mx-auto">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 xs:gap-3">
+              <Link href="/" className="w-full">
+                <Button variant="outline" className="w-full h-10 xs:h-12 text-sm xs:text-base font-medium hover:bg-purple-600 hover:text-white hover:border-purple-600 transition-all duration-200 break-words">
+                  Veo3 Prompt Generator
+                </Button>
+              </Link>
+              <Link href="/video-script-generator" className="w-full">
+                <Button variant="outline" className="w-full h-10 xs:h-12 text-sm xs:text-base font-medium hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all duration-200 break-words">
+                  Video Script Generator
+                </Button>
+              </Link>
+              <Button className="w-full h-10 xs:h-12 text-sm xs:text-base font-medium bg-green-600 hover:bg-green-700 text-white break-words">
+                Video to Prompt Generator
+              </Button>
+              <Link href="/transcription" className="w-full">
+                <Button variant="outline" className="w-full h-10 xs:h-12 text-sm xs:text-base font-medium hover:bg-orange-600 hover:text-white hover:border-orange-600 transition-all duration-200 break-words">
+                  Video Transcription
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        {/* Main Form Card */}
+        <Card className="shadow-lg bg-white dark:bg-gray-800 mb-6 xs:mb-8 mx-1 xs:mx-2 sm:mx-0 rounded-lg">
+          <CardContent className="p-4 xs:p-5 sm:p-6">
+            {/* Video Upload Section */}
+            <div className="mb-4 xs:mb-6">
+              <label className="text-sm xs:text-base font-bold mb-2 block">Upload Video:</label>
+              <div
+                {...getRootProps()}
+                className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${
+                  isDragActive
+                    ? "border-green-500 bg-green-50 dark:bg-green-950/20"
+                    : "border-gray-300 dark:border-gray-600 hover:border-green-500 dark:hover:border-green-500"
+                }`}
+              >
+                <input {...getInputProps()} />
+                <Upload className="mx-auto h-8 w-8 text-gray-400 mb-2" />
+                <p className="text-sm xs:text-base text-gray-600 dark:text-gray-400">
+                  {isDragActive ? "Drop the video here..." : "Drag & drop a video file here, or click to select"}
+                </p>
+                <p className="text-xs text-gray-500 mt-1">Supports MP4, MOV, AVI (Max 100MB)</p>
               </div>
             </div>
 
-            {/* Main Form Card */}
-            <Card className="shadow-lg bg-white dark:bg-gray-800 mb-6 xs:mb-8 mx-3 xs:mx-4 sm:mx-0">
-              <CardContent className="p-3 xs:p-4 sm:p-6">
-                {/* Video Upload Section */}
-                <div className="mb-4 xs:mb-6">
-                  <label className="text-xs xs:text-sm sm:text-base font-bold mb-2 block">
-                    Upload Your Video
-                  </label>
-                  
-                  {!uploadedVideo ? (
-                    <div
-                      {...getRootProps()}
-                      className={`border-2 border-dashed rounded-lg p-4 xs:p-6 sm:p-8 text-center cursor-pointer transition-colors ${
-                        isDragActive 
-                          ? 'border-green-500 bg-green-50 dark:bg-green-900/20' 
-                          : 'border-gray-300 dark:border-gray-600 hover:border-green-400'
-                      }`}
-                    >
-                      <input {...getInputProps()} />
-                      <Upload className="h-8 w-8 xs:h-10 xs:w-10 sm:h-12 sm:w-12 mx-auto mb-2 xs:mb-4 text-gray-400" />
-                      {isDragActive ? (
-                        <p className="text-green-600 font-medium text-sm xs:text-base">Drop the video here...</p>
-                      ) : (
-                        <div>
-                          <p className="text-sm xs:text-base sm:text-lg font-medium mb-1 xs:mb-2">Drag & drop your video here</p>
-                          <p className="text-xs xs:text-sm text-gray-500 mb-2 xs:mb-4">or click to browse files</p>
-                          <p className="text-xs text-gray-400">
-                            Supports: MP4, AVI, MOV, WMV, FLV, WebM (Max 100MB)
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    <div className="border border-gray-200 dark:border-gray-600 rounded-lg p-3 xs:p-4">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-2 xs:space-x-3">
-                          <FileVideo className="h-5 w-5 xs:h-6 xs:w-6 text-green-600" />
-                          <div>
-                            <p className="text-sm xs:text-base font-medium truncate">{uploadedVideo.name}</p>
-                            <p className="text-xs text-gray-500">
-                              {(uploadedVideo.size / (1024 * 1024)).toFixed(2)} MB
-                            </p>
-                          </div>
-                        </div>
-                        <Button
-                          onClick={removeVideo}
-                          variant="ghost"
-                          size="sm"
-                          className="text-red-600 hover:text-red-700 h-8 w-8 xs:h-10 xs:w-10 p-0"
-                        >
-                          <X className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Action Buttons */}
-                <div className="flex flex-col sm:flex-row gap-2 xs:gap-3">
-                  <Button
-                    onClick={generatePrompt}
-                    disabled={isProcessing || !uploadedVideo}
-                    className="flex-1 bg-green-600 hover:bg-green-700 text-white h-10 xs:h-12 sm:h-14 text-xs xs:text-sm sm:text-base font-medium"
-                  >
-                    {isProcessing ? (
-                      <>
-                        <Loader2 className="h-3 w-3 xs:h-4 xs:w-4 sm:h-5 sm:w-5 mr-1 xs:mr-2 animate-spin" />
-                        Analyzing...
-                      </>
-                    ) : (
-                      <>
-                        <Brain className="h-3 w-3 xs:h-4 xs:w-4 sm:h-5 sm:w-5 mr-1 xs:mr-2" />
-                        Generate Prompt
-                      </>
-                    )}
-                  </Button>
-                  <Button
-                    onClick={clearAll}
-                    variant="outline"
-                    className="h-10 xs:h-12 sm:h-14 px-4 xs:px-6 text-xs xs:text-sm sm:text-base"
-                    disabled={isProcessing || (!uploadedVideo && !generatedPrompt)}
-                  >
-                    Reset
-                  </Button>
-                </div>
-
-                {/* Result Container */}
-                {generatedPrompt && (
-                  <div className="mt-4 xs:mt-6 p-3 xs:p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                    <h4 className="font-bold mb-2 text-xs xs:text-sm sm:text-base">Generated Prompt:</h4>
-                    <pre className="whitespace-pre-wrap text-xs xs:text-sm sm:text-base overflow-x-auto">{generatedPrompt}</pre>
+            {/* Uploaded Video Display */}
+            {uploadedVideo && (
+              <div className="mb-4 xs:mb-6 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <Video className="h-4 w-4 text-green-600" />
+                    <span className="text-sm xs:text-base font-medium">{uploadedVideo.name}</span>
                   </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setUploadedVideo(null)}
+                    className="text-red-600 hover:text-red-700 h-8 px-2"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {/* Action Buttons */}
+            <div className="flex gap-3 xs:gap-4">
+              <Button
+                onClick={generatePrompt}
+                disabled={isProcessing || !uploadedVideo}
+                className="flex-1 bg-green-600 hover:bg-green-700 text-white h-10 xs:h-12 text-sm xs:text-base font-medium rounded-lg"
+              >
+                {isProcessing ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Analyzing Video...
+                  </>
+                ) : (
+                  <>
+                    <Brain className="mr-2 h-4 w-4" />
+                    Generate Prompt
+                  </>
                 )}
-              </CardContent>
-            </Card>
+              </Button>
+              <Button
+                onClick={clearAll}
+                variant="outline"
+                className="h-10 xs:h-12 px-4 xs:px-6 text-sm xs:text-base rounded-lg"
+                disabled={isProcessing || (!uploadedVideo && !generatedPrompt)}
+              >
+                Clear
+              </Button>
+            </div>
 
-            {/* How Video to Prompt Generator Works */}
-            <Card className="shadow-lg bg-white dark:bg-gray-800 mb-6 xs:mb-8 mx-3 xs:mx-4 sm:mx-0">
-              <CardHeader>
-                <CardTitle className="text-lg xs:text-xl sm:text-2xl font-bold text-green-600 flex items-center gap-2">
-                  <Eye className="h-5 w-5 xs:h-6 xs:w-6" />
-                  How Video to Prompt Generator Works
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4 xs:space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 xs:gap-6">
-                  <div className="space-y-3 xs:space-y-4">
-                    <div className="flex items-start gap-3">
-                      <div className="w-8 h-8 xs:w-10 xs:h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <Brain className="h-4 w-4 xs:h-5 xs:w-5 text-green-600" />
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-sm xs:text-base">AI Video Analysis</h4>
-                        <p className="text-xs xs:text-sm text-muted-foreground">Our advanced AI analyzes your video by examining scenes, objects, actions, colors, and lighting to understand the content.</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <div className="w-8 h-8 xs:w-10 xs:h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <Target className="h-4 w-4 xs:h-5 xs:w-5 text-green-600" />
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-sm xs:text-base">Scene Detection</h4>
-                        <p className="text-xs xs:text-sm text-muted-foreground">Identifies key scenes, objects, and actions to create comprehensive scene descriptions.</p>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="space-y-3 xs:space-y-4">
-                    <div className="flex items-start gap-3">
-                      <div className="w-8 h-8 xs:w-10 xs:h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <Zap className="h-4 w-4 xs:h-5 xs:w-5 text-green-600" />
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-sm xs:text-base">Prompt Generation</h4>
-                        <p className="text-xs xs:text-sm text-muted-foreground">Converts video analysis into detailed prompts suitable for AI video generation platforms.</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <div className="w-8 h-8 xs:w-10 xs:h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <FileVideo className="h-4 w-4 xs:h-5 xs:w-5 text-green-600" />
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-sm xs:text-base">Multi-Format Support</h4>
-                        <p className="text-xs xs:text-sm text-muted-foreground">Supports all major video formats including MP4, AVI, MOV, WMV, FLV, and WebM.</p>
-                      </div>
-                    </div>
-                  </div>
+            {/* Result Container */}
+            {generatedPrompt && (
+              <div className="mt-4 xs:mt-6 p-4 xs:p-5 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <h4 className="font-bold mb-2 text-sm xs:text-base">Generated Prompt:</h4>
+                <pre className="whitespace-pre-wrap text-sm xs:text-base overflow-x-auto">{generatedPrompt}</pre>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* How Video to Prompt Generator Works */}
+        <Card className="shadow-lg bg-white dark:bg-gray-800 mb-6 xs:mb-8 mx-1 xs:mx-2 sm:mx-0 rounded-lg">
+          <CardHeader>
+            <CardTitle className="text-lg xs:text-xl sm:text-2xl font-bold text-green-600 flex items-center gap-2">
+              <Brain className="h-5 w-5" />
+              How Video to Prompt Generator Works
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-4 xs:p-5">
+            <div className="space-y-4">
+              <div className="flex items-start gap-3">
+                <div className="w-8 h-8 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                  <span className="text-green-600 font-bold text-sm">1</span>
                 </div>
-              </CardContent>
-            </Card>
+                <div>
+                  <h4 className="font-semibold text-sm xs:text-base mb-1">Upload Your Video</h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Upload any video file (MP4, MOV, AVI) up to 100MB. Our system will analyze the visual content.</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="w-8 h-8 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                  <span className="text-green-600 font-bold text-sm">2</span>
+                </div>
+                <div>
+                  <h4 className="font-semibold text-sm xs:text-base mb-1">AI Analysis</h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Our advanced AI extracts key visual elements, scenes, objects, and actions from your video.</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="w-8 h-8 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                  <span className="text-green-600 font-bold text-sm">3</span>
+                </div>
+                <div>
+                  <h4 className="font-semibold text-sm xs:text-base mb-1">Generate Prompt</h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Get a comprehensive prompt that can be used to generate similar or enhanced video content with AI platforms.</p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
-            {/* Simple Paragraph About the Tool */}
-            <Card className="shadow-lg bg-white dark:bg-gray-800 mb-6 xs:mb-8 mx-3 xs:mx-4 sm:mx-0">
-              <CardContent className="p-4 xs:p-6">
-                <h3 className="text-lg xs:text-xl font-bold mb-3 xs:mb-4 text-green-600">About Video to Prompt Generator</h3>
-                <p className="text-sm xs:text-base text-gray-700 dark:text-gray-300 leading-relaxed">
-                  Our Video to Prompt Generator is an innovative AI-powered tool that transforms your existing videos into detailed prompts for AI video generation platforms. By analyzing your video content, our advanced AI extracts key visual elements, scenes, objects, and actions to create comprehensive prompts that can be used to generate similar or enhanced video content. This tool is perfect for content creators, marketers, and video producers who want to leverage their existing content to create new AI-generated videos with consistent style and messaging.
-                </p>
-              </CardContent>
-            </Card>
+        {/* Simple Paragraph About the Tool */}
+        <Card className="shadow-lg bg-white dark:bg-gray-800 mb-6 xs:mb-8 mx-1 xs:mx-2 sm:mx-0 rounded-lg">
+          <CardContent className="p-4 xs:p-5">
+            <h3 className="text-lg xs:text-xl font-bold mb-3 xs:mb-4 text-green-600">About Video to Prompt Generator</h3>
+            <p className="text-sm xs:text-base text-gray-700 dark:text-gray-300 leading-relaxed">
+              Our Video to Prompt Generator is an innovative AI-powered tool that transforms your existing videos into detailed prompts for AI video generation platforms. By analyzing your video content, our advanced AI extracts key visual elements, scenes, objects, and actions to create comprehensive prompts that can be used to generate similar or enhanced video content. This tool is perfect for content creators, marketers, and video producers who want to leverage their existing content to create new AI-generated videos with consistent style and messaging.
+            </p>
+          </CardContent>
+        </Card>
 
-            {/* FAQ Section */}
-            <Card className="shadow-lg bg-white dark:bg-gray-800 mx-3 xs:mx-4 sm:mx-0">
-              <CardHeader>
-                <CardTitle className="text-lg xs:text-xl sm:text-2xl font-bold text-green-600">Frequently Asked Questions</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Accordion type="single" collapsible className="w-full">
-                  {faqs.map((faq, index) => (
-                    <AccordionItem key={index} value={`item-${index}`}>
-                      <AccordionTrigger className="text-left text-xs xs:text-sm sm:text-base">
-                        {faq.question}
-                      </AccordionTrigger>
-                      <AccordionContent className="text-muted-foreground text-xs xs:text-sm sm:text-base">
-                        {faq.answer}
-                      </AccordionContent>
-                    </AccordionItem>
-                  ))}
-                </Accordion>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
-    </main>
+        {/* FAQ Section */}
+        <Card className="shadow-lg bg-white dark:bg-gray-800 mx-1 xs:mx-2 sm:mx-0 rounded-lg">
+          <CardHeader>
+            <CardTitle className="text-lg xs:text-xl sm:text-2xl font-bold text-green-600">Frequently Asked Questions</CardTitle>
+          </CardHeader>
+          <CardContent className="p-4 xs:p-5">
+            <Accordion type="single" collapsible className="w-full">
+              <AccordionItem value="item-1">
+                <AccordionTrigger className="text-sm xs:text-base">What video formats are supported?</AccordionTrigger>
+                <AccordionContent className="text-sm text-gray-600 dark:text-gray-400">
+                  We support most common video formats including MP4, MOV, AVI, and more. The maximum file size is 100MB to ensure fast processing and analysis.
+                </AccordionContent>
+              </AccordionItem>
+              <AccordionItem value="item-2">
+                <AccordionTrigger className="text-sm xs:text-base">How accurate are the generated prompts?</AccordionTrigger>
+                <AccordionContent className="text-sm text-gray-600 dark:text-gray-400">
+                  Our AI provides highly accurate analysis of visual elements, scenes, and actions. The generated prompts capture the essence and key components of your original video for effective AI video generation.
+                </AccordionContent>
+              </AccordionItem>
+              <AccordionItem value="item-3">
+                <AccordionTrigger className="text-sm xs:text-base">Can I use the prompts with any AI video platform?</AccordionTrigger>
+                <AccordionContent className="text-sm text-gray-600 dark:text-gray-400">
+                  Yes! The generated prompts are designed to be compatible with most AI video generation platforms including Runway, Pika Labs, Veo3, and others. You can modify the prompts as needed for specific platforms.
+                </AccordionContent>
+              </AccordionItem>
+              <AccordionItem value="item-4">
+                <AccordionTrigger className="text-sm xs:text-base">Is my video content secure?</AccordionTrigger>
+                <AccordionContent className="text-sm text-gray-600 dark:text-gray-400">
+                  Absolutely. We prioritize your privacy and security. Videos are processed securely and are not stored permanently. We only analyze the content to generate prompts and do not retain your video files.
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
   )
 } 

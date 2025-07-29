@@ -53,7 +53,21 @@ export function AdvancedPromptGenerator({ locale }: AdvancedPromptGeneratorProps
         throw new Error(data.error || "Failed to generate prompt")
       }
 
-      setGeneratedPrompt(data.prompt)
+              console.log("API Response:", data) // Debug log
+
+        // Handle both old and new response formats
+        let prompt = "No prompt generated"
+
+        if (data.jsonPrompt && data.paragraphPrompt) {
+          // New dual format - store separately for dual-box display
+          prompt = `JSON:${data.jsonPrompt}|||PARAGRAPH:${data.paragraphPrompt}`
+        } else if (data.jsonPrompt) {
+          prompt = data.jsonPrompt
+        } else if (data.prompt) {
+          prompt = data.prompt
+        }
+
+        setGeneratedPrompt(prompt)
 
       toast({
         title: "Advanced prompt generated!",
@@ -203,16 +217,99 @@ export function AdvancedPromptGenerator({ locale }: AdvancedPromptGeneratorProps
 
       {/* Generated Prompt Output */}
       {generatedPrompt && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Generated Advanced Prompt</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="bg-muted/50 rounded-lg p-4">
-              <pre className="whitespace-pre-wrap text-sm leading-relaxed">{generatedPrompt}</pre>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="space-y-4">
+          {/* JSON Format Box */}
+          {generatedPrompt.includes('JSON:') && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center justify-between">
+                  <span className="flex items-center gap-2">
+                    <span className="text-lg">📋</span>
+                    JSON Format (Technical)
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={async () => {
+                      const jsonContent = generatedPrompt.split('JSON:')[1]?.split('|||')[0] || ''
+                      await navigator.clipboard.writeText(jsonContent)
+                      toast({
+                        title: "Copied!",
+                        description: "JSON format copied to clipboard",
+                      })
+                    }}
+                    className="text-xs"
+                  >
+                    📋 Copy
+                  </Button>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 border">
+                  <pre className="whitespace-pre-wrap text-xs leading-relaxed font-mono text-gray-800 dark:text-gray-200 overflow-x-auto">
+                    {generatedPrompt.split('JSON:')[1]?.split('|||')[0] || ''}
+                  </pre>
+                </div>
+                <p className="text-xs text-muted-foreground mt-2">
+                  Use this structured format for technical AI processing and API integrations.
+                </p>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Paragraph Format Box */}
+          {generatedPrompt.includes('PARAGRAPH:') && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center justify-between">
+                  <span className="flex items-center gap-2">
+                    <span className="text-lg">📝</span>
+                    Paragraph Format (Creative)
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={async () => {
+                      const paragraphContent = generatedPrompt.split('PARAGRAPH:')[1] || ''
+                      await navigator.clipboard.writeText(paragraphContent)
+                      toast({
+                        title: "Copied!",
+                        description: "Paragraph format copied to clipboard",
+                      })
+                    }}
+                    className="text-xs"
+                  >
+                    📋 Copy
+                  </Button>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-700">
+                  <pre className="whitespace-pre-wrap text-xs leading-relaxed text-gray-800 dark:text-gray-200">
+                    {generatedPrompt.split('PARAGRAPH:')[1] || ''}
+                  </pre>
+                </div>
+                <p className="text-xs text-muted-foreground mt-2">
+                  Use this narrative format for creative AI processing and storytelling.
+                </p>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Fallback for old format */}
+          {!generatedPrompt.includes('JSON:') && !generatedPrompt.includes('PARAGRAPH:') && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Generated Advanced Prompt</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="bg-muted/50 rounded-lg p-4">
+                  <pre className="whitespace-pre-wrap text-xs leading-relaxed text-gray-800 dark:text-gray-200">{generatedPrompt}</pre>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </div>
       )}
     </div>
   )

@@ -100,7 +100,7 @@ Format your response as valid JSON with 'jsonAnalysis' and 'paragraphDescription
       },
     }
 
-    const response = await this.makeRequest("/models/gemini-2.5-flash-exp:generateContent", data)
+    const response = await this.makeRequest("/models/gemini-2.5-flash:generateContent", data)
     const content = response.candidates[0]?.content?.parts[0]?.text
 
     if (!content) {
@@ -178,7 +178,7 @@ Format as valid JSON with 'jsonAnalysis' and 'paragraphDescription' fields.`
       },
     }
 
-    const response = await this.makeRequest("/models/gemini-2.5-flash-exp:generateContent", data)
+    const response = await this.makeRequest("/models/gemini-2.5-flash:generateContent", data)
     const content = response.candidates[0]?.content?.parts[0]?.text
 
     if (!content) {
@@ -253,7 +253,7 @@ Always provide detailed, professional analysis regardless of audio content type.
       },
     }
 
-    const response = await this.makeRequest("/models/gemini-2.5-flash-exp:generateContent", data)
+    const response = await this.makeRequest("/models/gemini-2.5-flash:generateContent", data)
     const content = response.candidates[0]?.content?.parts[0]?.text
 
     if (!content) {
@@ -319,7 +319,7 @@ Respond in a conversational, helpful tone while maintaining professional experti
       },
     }
 
-    const response = await this.makeRequest("/models/gemini-2.5-flash-exp:generateContent", data)
+    const response = await this.makeRequest("/models/gemini-2.5-flash:generateContent", data)
     const content = response.candidates[0]?.content?.parts[0]?.text
 
     if (!content) {

@@ -17,7 +17,11 @@ interface Veo3PromptGeneratorProps {
 export function Veo3PromptGenerator({ locale }: Veo3PromptGeneratorProps) {
   const [activeMode, setActiveMode] = useState("structured")
   const [isGenerating, setIsGenerating] = useState(false)
-  const [generatedPrompt, setGeneratedPrompt] = useState("")
+  const [generatedPrompts, setGeneratedPrompts] = useState<{
+    jsonPrompt: string
+    paragraphPrompt: string
+    metadata?: any
+  } | null>(null)
   const { toast } = useToast()
 
   // Structured Mode State
@@ -44,10 +48,10 @@ export function Veo3PromptGenerator({ locale }: Veo3PromptGeneratorProps) {
     }
 
     setIsGenerating(true)
-    setGeneratedPrompt("")
+    setGeneratedPrompts(null)
 
     try {
-      const response = await fetch("/api/generate-advanced-prompt", {
+      const response = await fetch("/api/generate-veo3-prompt", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -61,11 +65,15 @@ export function Veo3PromptGenerator({ locale }: Veo3PromptGeneratorProps) {
         throw new Error(data.error || "Failed to generate prompt")
       }
 
-      setGeneratedPrompt(data.prompt)
+      setGeneratedPrompts({
+        jsonPrompt: data.jsonPrompt,
+        paragraphPrompt: data.paragraphPrompt,
+        metadata: data.metadata
+      })
 
       toast({
-        title: "Prompt generated successfully!",
-        description: "Your Veo3 prompt is ready.",
+        title: "AI Prompt Generated!",
+        description: "Both JSON and paragraph formats are ready.",
       })
     } catch (error) {
       console.error("Error generating prompt:", error)
@@ -90,7 +98,7 @@ export function Veo3PromptGenerator({ locale }: Veo3PromptGeneratorProps) {
     }
 
     setIsGenerating(true)
-    setGeneratedPrompt("")
+    setGeneratedPrompts(null)
 
     try {
       const response = await fetch("/api/generate-chat-prompt", {
@@ -107,11 +115,15 @@ export function Veo3PromptGenerator({ locale }: Veo3PromptGeneratorProps) {
         throw new Error(data.error || "Failed to generate prompt")
       }
 
-      setGeneratedPrompt(data.prompt)
+      setGeneratedPrompts({
+        jsonPrompt: data.jsonPrompt,
+        paragraphPrompt: data.paragraphPrompt,
+        metadata: data.metadata
+      })
 
       toast({
-        title: "Prompt generated successfully!",
-        description: "Your video prompt is ready.",
+        title: "AI Prompt Generated!",
+        description: "Both JSON and paragraph formats are ready.",
       })
     } catch (error) {
       console.error("Error generating prompt:", error)
@@ -298,18 +310,105 @@ export function Veo3PromptGenerator({ locale }: Veo3PromptGeneratorProps) {
             </CardContent>
           </Card>
 
-          {/* Generated Prompt Output */}
-          {generatedPrompt && (
-            <Card className="mt-6">
-              <CardHeader>
-                <CardTitle>Generated Prompt</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="bg-muted/50 rounded-lg p-4">
-                  <pre className="whitespace-pre-wrap text-sm leading-relaxed">{generatedPrompt}</pre>
-                </div>
-              </CardContent>
-            </Card>
+          {/* Generated Prompts Output */}
+          {generatedPrompts && (
+            <div className="mt-6 space-y-6">
+              {/* JSON Format */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center justify-between">
+                    <span className="flex items-center gap-2">
+                      <span className="text-lg">📋</span>
+                      JSON Format (Technical)
+                    </span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={async () => {
+                        await navigator.clipboard.writeText(generatedPrompts.jsonPrompt)
+                        toast({
+                          title: "Copied!",
+                          description: "JSON format copied to clipboard",
+                        })
+                      }}
+                      className="text-xs"
+                    >
+                      📋 Copy
+                    </Button>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="bg-gray-50 rounded-lg p-4 border">
+                    <pre className="whitespace-pre-wrap text-sm leading-relaxed font-mono text-gray-800">
+                      {generatedPrompts.jsonPrompt}
+                    </pre>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Use this structured format for technical AI processing and API integrations.
+                  </p>
+                </CardContent>
+              </Card>
+
+              {/* Paragraph Format */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center justify-between">
+                    <span className="flex items-center gap-2">
+                      <span className="text-lg">📝</span>
+                      Paragraph Format (Creative)
+                    </span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={async () => {
+                        await navigator.clipboard.writeText(generatedPrompts.paragraphPrompt)
+                        toast({
+                          title: "Copied!",
+                          description: "Paragraph format copied to clipboard",
+                        })
+                      }}
+                      className="text-xs"
+                    >
+                      📋 Copy
+                    </Button>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="bg-blue-50 rounded-lg p-4 border">
+                    <pre className="whitespace-pre-wrap text-sm leading-relaxed text-blue-900">
+                      {generatedPrompts.paragraphPrompt}
+                    </pre>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Use this narrative format for creative AI processing and storytelling.
+                  </p>
+                </CardContent>
+              </Card>
+
+              {/* AI Status */}
+              {generatedPrompts.metadata && (
+                <Card className="bg-green-50 border-green-200">
+                  <CardContent className="pt-6">
+                    <div className="flex items-center justify-between text-sm">
+                      <div className="flex items-center gap-2">
+                        <span className="text-green-600">🤖</span>
+                        <span className="text-green-800">
+                          AI Powered by {generatedPrompts.metadata.model}
+                        </span>
+                      </div>
+                      <div className="text-green-600">
+                        {generatedPrompts.metadata.processingTime}ms
+                      </div>
+                    </div>
+                    {generatedPrompts.metadata.fallbackUsed && (
+                      <p className="text-xs text-yellow-600 mt-1">
+                        ⚠️ Used fallback API for enhanced reliability
+                      </p>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+            </div>
           )}
         </div>
       </div>
