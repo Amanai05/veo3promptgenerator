@@ -15,6 +15,7 @@ AI-powered prompt generation from images and videos using Gemini 2.5 Pro with Op
 
 ### 1. Environment Variables
 
+#### For Local Development
 Create a `.env.local` file in the root directory:
 
 \`\`\`bash
@@ -32,6 +33,19 @@ GOOGLE_SITE_VERIFICATION=your_google_verification_code
 NEXT_PUBLIC_GTM_ID=GTM-XXXXXXX
 NEXT_PUBLIC_FACEBOOK_PIXEL_ID=your_facebook_pixel_id
 \`\`\`
+
+#### For Vercel Deployment
+1. **Go to your Vercel project dashboard**
+2. **Navigate to Settings → Environment Variables**
+3. **Add these required variables:**
+   - `GEMINI_API_KEY` = your actual Gemini API key
+   - `OPENROUTER_API_KEY` = your actual OpenRouter API key
+   - `NEXT_PUBLIC_SITE_URL` = your Vercel deployment URL
+4. **Select all environments** (Production, Preview, Development)
+5. **Click "Save"**
+6. **Redeploy your project**
+
+**Note**: Vercel will now automatically detect these required environment variables and prompt you to configure them during deployment.
 
 ### 2. Get API Keys
 

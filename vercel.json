@@ -1,0 +1,18 @@
+{
+  "env": {
+    "GEMINI_API_KEY": "@gemini_api_key",
+    "OPENROUTER_API_KEY": "@openrouter_api_key",
+    "NEXT_PUBLIC_SITE_URL": "@site_url"
+  },
+  "build": {
+    "env": {
+      "GEMINI_API_KEY": "@gemini_api_key",
+      "OPENROUTER_API_KEY": "@openrouter_api_key"
+    }
+  },
+  "functions": {
+    "app/api/**/*.ts": {
+      "maxDuration": 30
+    }
+  }
+} 
