@@ -8,7 +8,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { useState } from "react"
 import { Loader2, FileText, Lightbulb, Clock, Users, Target, Brain } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
-import Link from "next/link"
+import { ToolNavigation } from "@/components/tool-navigation"
 
 export default function VideoScriptGeneratorPage() {
   const [activeTab, setActiveTab] = useState("video-script")
@@ -138,10 +138,10 @@ export default function VideoScriptGeneratorPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-      <div className="max-w-[720px] mx-auto px-2 xs:px-3 sm:px-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 dark:from-black dark:from-black dark:from-black">
+      <div className="max-w-[720px] mx-auto px-2 xs:px-3 sm:px-4 pt-6 xs:pt-8 sm:pt-10">
         {/* Headline with Accent Color */}
-        <h1 className="text-center text-xl xs:text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 xs:mb-3 px-1">
+        <h1 className="text-center text-3xl xs:text-4xl sm:text-5xl lg:text-5xl font-bold mb-2 xs:mb-3 px-1">
           Video Script Generator <span className="text-blue-600">Free Online</span>
         </h1>
 
@@ -151,30 +151,7 @@ export default function VideoScriptGeneratorPage() {
         </p>
 
         {/* Navigation Tabs */}
-        <div className="mb-6 xs:mb-8 px-1">
-          <div className="w-full max-w-md mx-auto">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 xs:gap-3">
-              <Link href="/" className="w-full">
-                <Button variant="outline" className="w-full h-10 xs:h-12 text-sm xs:text-base font-medium hover:bg-purple-600 hover:text-white hover:border-purple-600 transition-all duration-200 break-words">
-                  Veo3 Prompt Generator
-                </Button>
-              </Link>
-              <Button className="w-full h-10 xs:h-12 text-sm xs:text-base font-medium bg-blue-600 hover:bg-blue-700 text-white break-words">
-                Video Script Generator
-              </Button>
-              <Link href="/video-to-prompt" className="w-full">
-                <Button variant="outline" className="w-full h-10 xs:h-12 text-sm xs:text-base font-medium hover:bg-green-600 hover:text-white hover:border-green-600 transition-all duration-200 break-words">
-                  Video to Prompt Generator
-                </Button>
-              </Link>
-              <Link href="/transcription" className="w-full">
-                <Button variant="outline" className="w-full h-10 xs:h-12 text-sm xs:text-base font-medium hover:bg-orange-600 hover:text-white hover:border-orange-600 transition-all duration-200 break-words">
-                  Video Transcription
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </div>
+        <ToolNavigation activeTool="video-script-generator" />
 
         {/* Main Form Card - COMES FIRST */}
         <Card className="shadow-lg bg-white dark:bg-gray-800 mb-6 xs:mb-8 mx-1 xs:mx-2 sm:mx-0 rounded-lg">

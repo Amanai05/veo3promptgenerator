@@ -43,8 +43,8 @@ export function HomeSections() {
     },
     {
       icon: Brain,
-      title: "Detailed JSON Prompts",
-      description: "Get highly detailed, scene-by-scene JSON prompts with technical specifications and metadata for developers."
+      title: "Advanced AI Models",
+      description: "Powered by Gemini 2.5 Pro with intelligent fallback to OpenRouter for maximum reliability."
     },
     {
       icon: Globe,
@@ -54,20 +54,20 @@ export function HomeSections() {
     {
       icon: TrendingUp,
       title: "Real-time Processing",
-      description: "Watch your prompts generate in real-time with live progress indicators and fallback protection."
+      description: "Watch your content generate in real-time with live progress indicators and fallback protection."
     },
     {
       icon: Award,
       title: "Premium Quality",
-      description: "High-quality prompts suitable for professional use and creative projects with AI-powered enhancement."
+      description: "High-quality outputs suitable for professional use and creative projects with AI-powered enhancement."
     }
   ]
 
   const steps = [
     {
       icon: Upload,
-      title: "Upload Your Media",
-      description: "Simply drag and drop your images or videos, or click to browse and select files from your device.",
+      title: "Upload Your Content",
+      description: "Simply drag and drop your images, videos, or text, or click to browse and select files from your device.",
       step: "01"
     },
     {
@@ -78,32 +78,36 @@ export function HomeSections() {
     },
     {
       icon: Download,
-      title: "Get Your Prompts",
-      description: "Receive detailed prompts in multiple formats - JSON for developers, paragraphs for creators.",
+      title: "Get Your Results",
+      description: "Receive detailed outputs in multiple formats - JSON for developers, paragraphs for creators.",
       step: "03"
     }
   ]
 
-  const veo3Features = [
+  const tools = [
     {
-      icon: Sparkles,
-      title: "Advanced Character Development",
-      description: "Create detailed character profiles with voice specifications, dialogue, and personality traits for consistent video generation."
+      icon: Video,
+      title: "Veo3 Prompt Generator",
+      description: "Create detailed prompts for Google's Veo3 AI video generation with structured forms and advanced chat modes.",
+      link: "/veo3-prompt-generator"
+    },
+    {
+      icon: FileText,
+      title: "Video Script Generator",
+      description: "Generate professional video scripts for YouTube, TikTok, Instagram, and marketing campaigns.",
+      link: "/video-script-generator"
     },
     {
       icon: Camera,
-      title: "Scene-by-Scene Control",
-      description: "Define precise camera movements, lighting conditions, and environmental details for professional-quality videos."
+      title: "Video to Prompt",
+      description: "Convert existing videos into detailed prompts for AI video generation tools.",
+      link: "/video-to-prompt"
     },
     {
-      icon: MessageSquare,
-      title: "Multi-Language Support",
-      description: "Input in your native language and receive optimized English prompts for Google's Veo3 AI platform."
-    },
-    {
-      icon: Target,
-      title: "Audience Optimization",
-      description: "Tailor your prompts for specific platforms like TikTok, YouTube, Instagram, or professional marketing campaigns."
+      icon: Mic,
+      title: "Audio Transcription",
+      description: "Transcribe audio files with high accuracy and multiple output formats.",
+      link: "/transcription"
     }
   ]
 
@@ -111,34 +115,34 @@ export function HomeSections() {
     {
       icon: Rocket,
       title: "Save Hours of Work",
-      description: "Transform your ideas into production-ready prompts in minutes instead of hours of manual writing and refinement."
+      description: "Transform your ideas into production-ready content in minutes instead of hours of manual work."
     },
     {
       icon: Users,
       title: "Professional Quality",
-      description: "Access enterprise-grade prompt engineering techniques used by top content creators and marketing agencies."
+      description: "Access enterprise-grade AI techniques used by top content creators and marketing agencies."
     },
     {
       icon: Heart,
       title: "Creative Freedom",
-      description: "Focus on your creative vision while our AI handles the technical complexities of prompt optimization."
+      description: "Focus on your creative vision while our AI handles the technical complexities."
     },
     {
       icon: TrendingUp,
       title: "Better Results",
-      description: "Generate more engaging, consistent, and high-quality videos with optimized prompts designed for maximum impact."
+      description: "Generate more engaging, consistent, and high-quality content with optimized AI processing."
     }
   ]
 
   const whoCanBenefit = [
     {
       category: "Content Creators",
-      description: "YouTubers, TikTok creators, and social media influencers who need engaging video content quickly and consistently.",
+      description: "YouTubers, TikTok creators, and social media influencers who need engaging content quickly and consistently.",
       icon: Video
     },
     {
       category: "Marketing Teams",
-      description: "Digital marketers and agencies creating video campaigns, product demos, and brand storytelling content.",
+      description: "Digital marketers and agencies creating campaigns, product demos, and brand storytelling content.",
       icon: Target
     },
     {
@@ -148,15 +152,15 @@ export function HomeSections() {
     },
     {
       category: "Businesses",
-      description: "Companies and entrepreneurs creating promotional videos, product demonstrations, and corporate communications.",
+      description: "Companies and entrepreneurs creating promotional content, product demonstrations, and corporate communications.",
       icon: Shield
     }
   ]
 
   const faqs = [
     {
-      question: "How accurate are the AI-generated prompts?",
-      answer: "Our AI models achieve 99.5% accuracy in prompt generation, with continuous improvements through machine learning and user feedback."
+      question: "How accurate are the AI-generated outputs?",
+      answer: "Our AI models achieve 99.5% accuracy in content generation, with continuous improvements through machine learning and user feedback."
     },
     {
       question: "What file formats are supported?",
@@ -167,8 +171,8 @@ export function HomeSections() {
       answer: "Yes, all files are processed securely and automatically deleted after processing. We use enterprise-grade encryption and never store your content permanently."
     },
     {
-      question: "Can I use the generated prompts commercially?",
-      answer: "Absolutely! All generated prompts are yours to use for any purpose, including commercial projects and client work."
+      question: "Can I use the generated content commercially?",
+      answer: "Absolutely! All generated content is yours to use for any purpose, including commercial projects and client work."
     },
     {
       question: "How long does processing take?",
@@ -182,57 +186,48 @@ export function HomeSections() {
 
   return (
     <>
-      {/* About Veo3 Prompt Generator Section */}
-      <section className="pt-4 pb-8 xs:pb-10 sm:pb-12 bg-muted/30">
+      {/* Tools Section */}
+      <section className="py-8 xs:py-12 sm:py-16 bg-background">
         <div className="container mx-auto px-3 xs:px-4 sm:px-6 lg:px-8">
-          <div className="max-w-[720px] mx-auto">
-            <Card className="p-3 xs:p-4 sm:p-5 shadow-none border border-muted bg-background">
-              <div className="mb-4 xs:mb-5 text-left">
-                <h2 className="text-base xs:text-lg sm:text-xl font-bold mb-2 text-purple-700">About Veo3 Prompt Generator</h2>
-                <p className="text-xs xs:text-sm text-muted-foreground leading-relaxed">
-                  Veo3 Prompt Generator is a minimal, fast, and secure AI tool for creating detailed, production-ready prompts for Google's Veo3 and other video AI models. It guides you through every step—context, characters, dialogue, camera, and more—so you can generate professional video scripts in minutes. Designed for creators, marketers, educators, and businesses, it makes prompt engineering simple, creative, and accessible for everyone.
-                </p>
-              </div>
-              <div className="mb-3 xs:mb-4">
-                <h3 className="text-xs xs:text-sm font-semibold mb-1 text-muted-foreground">Key Features</h3>
-                <ul className="list-none space-y-2">
-                  <li className="flex items-start gap-2"><Sparkles className="h-4 w-4 text-purple-500 mt-0.5" /><span className="text-xs xs:text-sm text-muted-foreground">Character, voice, and dialogue control</span></li>
-                  <li className="flex items-start gap-2"><Camera className="h-4 w-4 text-purple-500 mt-0.5" /><span className="text-xs xs:text-sm text-muted-foreground">Scene-by-scene camera and environment</span></li>
-                  <li className="flex items-start gap-2"><MessageSquare className="h-4 w-4 text-purple-500 mt-0.5" /><span className="text-xs xs:text-sm text-muted-foreground">Multi-language input, English output</span></li>
-                  <li className="flex items-start gap-2"><Zap className="h-4 w-4 text-purple-500 mt-0.5" /><span className="text-xs xs:text-sm text-muted-foreground">Fast, secure, and private</span></li>
-                </ul>
-              </div>
-              <div className="mb-3 xs:mb-4">
-                <h3 className="text-xs xs:text-sm font-semibold mb-1 text-muted-foreground">Benefits</h3>
-                <ul className="list-none space-y-2">
-                  <li className="flex items-start gap-2"><Rocket className="h-4 w-4 text-green-500 mt-0.5" /><span className="text-xs xs:text-sm text-muted-foreground">Save hours of manual writing</span></li>
-                  <li className="flex items-start gap-2"><Users className="h-4 w-4 text-green-500 mt-0.5" /><span className="text-xs xs:text-sm text-muted-foreground">Professional results for all skill levels</span></li>
-                  <li className="flex items-start gap-2"><Heart className="h-4 w-4 text-green-500 mt-0.5" /><span className="text-xs xs:text-sm text-muted-foreground">Focus on creativity, not formatting</span></li>
-                </ul>
-              </div>
-              <div>
-                <h3 className="text-xs xs:text-sm font-semibold mb-1 text-muted-foreground">Who Can Benefit</h3>
-                <ul className="list-none space-y-2">
-                  <li className="flex items-start gap-2"><Video className="h-4 w-4 text-blue-500 mt-0.5" /><span className="text-xs xs:text-sm text-muted-foreground">Content creators & influencers</span></li>
-                  <li className="flex items-start gap-2"><Target className="h-4 w-4 text-blue-500 mt-0.5" /><span className="text-xs xs:text-sm text-muted-foreground">Marketing teams & agencies</span></li>
-                  <li className="flex items-start gap-2"><Lightbulb className="h-4 w-4 text-blue-500 mt-0.5" /><span className="text-xs xs:text-sm text-muted-foreground">Educators & trainers</span></li>
-                  <li className="flex items-start gap-2"><Shield className="h-4 w-4 text-blue-500 mt-0.5" /><span className="text-xs xs:text-sm text-muted-foreground">Businesses & entrepreneurs</span></li>
-                </ul>
-              </div>
-            </Card>
+          <div className="text-center mb-6 xs:mb-8 sm:mb-12">
+            <h2 className="text-xl xs:text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 xs:mb-3 sm:mb-4">
+              Our <span className="text-purple-600">AI Tools</span>
+            </h2>
+            <p className="text-sm xs:text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto px-3 xs:px-4">
+              Discover our comprehensive suite of AI-powered tools designed for content creators and professionals.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 xs:gap-4 sm:gap-6">
+            {tools.map((tool, index) => (
+              <Card key={index} className="group hover:shadow-lg transition-all duration-300">
+                <CardContent className="pt-3 xs:pt-4 sm:pt-6 p-3 xs:p-4 sm:p-6">
+                  <div className="w-8 h-8 xs:w-10 xs:h-10 sm:w-12 sm:h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-2 xs:mb-3 sm:mb-4 group-hover:bg-purple-200 transition-colors">
+                    <tool.icon className="h-4 w-4 xs:h-5 xs:w-5 sm:h-6 sm:w-6 text-purple-600" />
+                  </div>
+                  <h3 className="text-sm xs:text-base sm:text-lg font-semibold mb-2">{tool.title}</h3>
+                  <p className="text-muted-foreground text-xs xs:text-sm sm:text-base mb-4">{tool.description}</p>
+                  <Button asChild variant="outline" size="sm">
+                    <Link href={tool.link}>
+                      Try Now
+                    </Link>
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </div>
       </section>
 
       {/* Why Choose Section */}
-      <section className="py-8 xs:py-12 sm:py-16 bg-background">
+      <section className="py-8 xs:py-12 sm:py-16 bg-muted/30">
         <div className="container mx-auto px-3 xs:px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-6 xs:mb-8 sm:mb-12">
             <h2 className="text-xl xs:text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 xs:mb-3 sm:mb-4">
-              Why Choose <span className="text-purple-600">VeO3 Prompt Generator</span>
+              Why Choose <span className="text-purple-600">Our Platform</span>
             </h2>
             <p className="text-sm xs:text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto px-3 xs:px-4">
-              Experience the most advanced AI-powered prompt generation platform with enterprise-grade features and reliability.
+              Experience the most advanced AI-powered content generation platform with enterprise-grade features and reliability.
             </p>
           </div>
 
@@ -253,14 +248,14 @@ export function HomeSections() {
       </section>
 
       {/* How It Works */}
-      <section className="py-8 xs:py-12 sm:py-16 bg-muted/30">
+      <section className="py-8 xs:py-12 sm:py-16 bg-background">
         <div className="container mx-auto px-3 xs:px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-6 xs:mb-8 sm:mb-12">
             <h2 className="text-xl xs:text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 xs:mb-3 sm:mb-4">
               How It <span className="text-purple-600">Works</span>
             </h2>
             <p className="text-sm xs:text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto px-3 xs:px-4">
-              Transform your media into powerful prompts in just three simple steps.
+              Transform your ideas into powerful content in just three simple steps.
             </p>
           </div>
 
@@ -283,6 +278,78 @@ export function HomeSections() {
         </div>
       </section>
 
+      {/* Benefits Section */}
+      <section className="py-8 xs:py-12 sm:py-16 bg-muted/30">
+        <div className="container mx-auto px-3 xs:px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-6 xs:mb-8 sm:mb-12">
+            <h2 className="text-xl xs:text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 xs:mb-3 sm:mb-4">
+              Key <span className="text-purple-600">Benefits</span>
+            </h2>
+            <p className="text-sm xs:text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto px-3 xs:px-4">
+              Discover how our AI platform can transform your content creation workflow.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 xs:gap-6 sm:gap-8">
+            {benefits.map((benefit, index) => (
+              <Card key={index} className="text-center">
+                <CardContent className="pt-3 xs:pt-4 sm:pt-6 p-3 xs:p-4 sm:p-6">
+                  <div className="w-8 h-8 xs:w-10 xs:h-10 sm:w-12 sm:h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-2 xs:mb-3 sm:mb-4">
+                    <benefit.icon className="h-4 w-4 xs:h-5 xs:w-5 sm:h-6 sm:w-6 text-green-600" />
+                  </div>
+                  <h3 className="text-sm xs:text-base sm:text-lg font-semibold mb-2">{benefit.title}</h3>
+                  <p className="text-muted-foreground text-xs xs:text-sm sm:text-base">{benefit.description}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* About Platform Section - Minimal */}
+      <section className="py-12 sm:py-16 lg:py-20 bg-white dark:bg-gray-900">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-4xl mx-auto">
+            <div className="flex flex-col lg:flex-row-reverse items-center gap-8 lg:gap-12">
+              {/* Text Content - Right Side */}
+              <div className="flex-1">
+                <div className="mb-4">
+                  <Button asChild variant="outline" className="px-3 py-1 text-sm font-medium border-green-500 text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20">
+                    <Link href="https://trustpilot.com" target="_blank" rel="noopener noreferrer">
+                      ⭐ Review us on Trustpilot
+                    </Link>
+                  </Button>
+                </div>
+                
+                <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-6 text-gray-900 dark:text-white">
+                  About <span className="text-purple-600 dark:text-purple-400">Veo3 Prompt Generator</span>
+                </h2>
+                
+                <div className="space-y-4">
+                  <p className="text-[15px] sm:text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
+                    Our mission is to revolutionize the way people create content, empowering them to unlock new levels of creativity and efficiency through AI-powered tools. We understand the challenges that content creators, marketers, and businesses face in today's fast-paced digital landscape, where quality content is essential for success.
+                  </p>
+                  <p className="text-[15px] sm:text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
+                    Join our team of expert AI engineers who created Veo3 Prompt Generator on this journey of unlocking AI's full potential. We believe in making AI accessible and easy-to-use through our expertly curated prompt generation tools. Our platform combines cutting-edge technology with intuitive design, ensuring that even beginners can create professional-quality content while providing advanced features for experienced users.
+                  </p>
+                  <p className="text-[15px] sm:text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
+                    With years of experience in AI development and content creation, we've built a comprehensive suite of tools that cater to diverse needs. From Veo3 prompt generation to video script creation, our platform offers everything you need to bring your creative vision to life. We're committed to continuous innovation, regularly updating our AI models and features to stay ahead of industry trends and user needs.
+                  </p>
+                </div>
+                
+                <div className="mt-6">
+                  <Button asChild variant="outline" className="border-purple-600 text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900/20">
+                    <Link href="/about">
+                      Read More About Us
+                    </Link>
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* FAQ Section */}
       <section className="py-8 xs:py-12 sm:py-16 bg-background">
         <div className="container mx-auto px-3 xs:px-4 sm:px-6 lg:px-8">
@@ -291,7 +358,7 @@ export function HomeSections() {
               Frequently Asked <span className="text-purple-600">Questions</span>
             </h2>
             <p className="text-sm xs:text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto px-3 xs:px-4">
-              Find answers to common questions about VeO3 Prompt Generator
+              Find answers to common questions about our AI platform
             </p>
           </div>
 
@@ -308,22 +375,46 @@ export function HomeSections() {
                 </AccordionItem>
               ))}
             </Accordion>
+            
+            {/* FAQ Schema Markup */}
+            <script
+              type="application/ld+json"
+              dangerouslySetInnerHTML={{
+                __html: JSON.stringify({
+                  "@context": "https://schema.org",
+                  "@type": "FAQPage",
+                  "mainEntity": faqs.map((faq) => ({
+                    "@type": "Question",
+                    "name": faq.question,
+                    "acceptedAnswer": {
+                      "@type": "Answer",
+                      "text": faq.answer
+                    }
+                  }))
+                })
+              }}
+            />
           </div>
         </div>
       </section>
 
       {/* Footer CTA */}
-      <section className="py-8 xs:py-12 sm:py-16 bg-gradient-to-br from-purple-600 to-purple-800 text-white">
+              <section className="py-8 xs:py-12 sm:py-16 bg-gradient-to-br from-purple-600 to-purple-800 dark:from-black dark:from-black dark:from-black text-white">
         <div className="container mx-auto px-3 xs:px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-xl xs:text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 xs:mb-3 sm:mb-4">
             Ready to Transform Your Content?
           </h2>
           <p className="text-sm xs:text-lg sm:text-xl mb-4 xs:mb-6 sm:mb-8 max-w-2xl mx-auto opacity-90 px-3 xs:px-4">
-            Join thousands of creators who are already using VeO3 Prompt Generator to create amazing content.
+            Join thousands of creators who are already using our AI platform to create amazing content.
           </p>
-          <Button asChild size="lg" variant="secondary" className="bg-white text-purple-600 hover:bg-gray-100 h-10 xs:h-12 sm:h-14 px-4 xs:px-6 sm:px-8 text-sm xs:text-base sm:text-lg">
-            <Link href="/#main-generators">Get Started Free</Link>
-          </Button>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button asChild size="lg" variant="secondary" className="bg-white text-purple-600 hover:bg-gray-100 h-10 xs:h-12 sm:h-14 px-4 xs:px-6 sm:px-8 text-sm xs:text-base sm:text-lg">
+              <Link href="/veo3-prompt-generator">Get Started Free</Link>
+            </Button>
+            <Button asChild size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-purple-600 h-10 xs:h-12 sm:h-14 px-4 xs:px-6 sm:px-8 text-sm xs:text-base sm:text-lg">
+              <Link href="/tools">Explore All Tools</Link>
+            </Button>
+          </div>
         </div>
       </section>
     </>

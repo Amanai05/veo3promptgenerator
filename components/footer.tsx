@@ -37,15 +37,9 @@ export function Footer() {
                 </button>
               </li>
               <li>
-                <button
-                  onClick={() => {
-                    const element = document.getElementById("veo3-prompt-generator")
-                    if (element) element.scrollIntoView({ behavior: "smooth" })
-                  }}
-                  className="text-muted-foreground hover:text-primary cursor-pointer text-left w-full py-1"
-                >
+                <Link href="/veo3-prompt-generator" className="text-muted-foreground hover:text-primary block py-1">
                   Veo3 Prompt Generator
-                </button>
+                </Link>
               </li>
             </ul>
           </div>
@@ -54,13 +48,13 @@ export function Footer() {
             <h3 className="font-semibold mb-2 xs:mb-3 sm:mb-4 text-xs xs:text-sm sm:text-base">Tools</h3>
             <ul className="space-y-1 xs:space-y-2 sm:space-y-3 text-xs xs:text-sm">
               <li>
-                <Link href="/tools/video-to-prompt" className="text-muted-foreground hover:text-primary block py-1">
+                <Link href="/video-to-prompt" className="text-muted-foreground hover:text-primary block py-1">
                   Video to Prompt
                 </Link>
               </li>
               <li>
-                <Link href="/tools/transcription" className="text-muted-foreground hover:text-primary block py-1">
-                  Transcription
+                <Link href="/transcription" className="text-muted-foreground hover:text-primary block py-1">
+                  Video Transcription
                 </Link>
               </li>
               <li>
