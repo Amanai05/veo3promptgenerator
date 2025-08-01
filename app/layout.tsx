@@ -1,13 +1,18 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { Inter } from "next/font/google"
+import { Poppins } from "next/font/google"
 import "./globals.css"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/toaster"
+import { Analytics } from '@vercel/analytics/react'
 
-const inter = Inter({ subsets: ["latin"] })
+const poppins = Poppins({ 
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-poppins"
+})
 
 export const metadata: Metadata = {
   title: "Veo3 Prompt Generator Free Online - AI Video Script & Prompt Tool",
@@ -54,13 +59,14 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
+      <body className={poppins.className}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <Header />
           {children}
           <Footer />
           <Toaster />
         </ThemeProvider>
+        {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>
   )

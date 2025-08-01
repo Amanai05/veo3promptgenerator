@@ -12,6 +12,8 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { useToast } from "@/hooks/use-toast"
 import { MessageSquare, Camera, FileText, Type, Info, Video, Loader2, Brain, Copy, Check, Settings } from "lucide-react"
 import { ToolNavigation } from "@/components/tool-navigation"
+import { ToastNotification } from "@/components/ui/toast-notification"
+import { useToastNotification } from "@/hooks/use-toast-notification"
 
 export default function Veo3PromptGeneratorPage() {
   const [activeMode, setActiveMode] = useState("chat")
@@ -22,6 +24,7 @@ export default function Veo3PromptGeneratorPage() {
     metadata?: any
   } | null>(null)
   const { toast } = useToast()
+  const { showToast, showToastAfterSuccess, closeToast } = useToastNotification()
 
   // Output options state
   const [outputOptions, setOutputOptions] = useState({
@@ -172,6 +175,9 @@ export default function Veo3PromptGeneratorPage() {
         title: "AI Prompt Generated!",
         description: `${outputTypes.join(" & ")} format${outputTypes.length > 1 ? 's' : ''} ready.`,
       })
+      
+      // Show bookmark toast notification
+      showToastAfterSuccess()
     } catch (error) {
       console.error("Error generating prompt:", error)
       toast({
@@ -286,6 +292,9 @@ export default function Veo3PromptGeneratorPage() {
         title: "Advanced AI Prompt Generated!",
         description: `${outputTypes.join(" & ")} format${outputTypes.length > 1 ? 's' : ''} ready.`,
       })
+      
+      // Show bookmark toast notification
+      showToastAfterSuccess()
     } catch (error) {
       console.error("Error generating advanced prompt:", error)
       toast({
@@ -756,6 +765,8 @@ export default function Veo3PromptGeneratorPage() {
                           title: "Copied!",
                           description: "JSON format copied to clipboard",
                         })
+                        // Show toast notification after copying
+                        showToastAfterSuccess()
                       }}
                       className="text-xs h-8 px-3"
                     >
@@ -763,7 +774,7 @@ export default function Veo3PromptGeneratorPage() {
                     </Button>
                   </div>
                   <div className="bg-white dark:bg-gray-900 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
-                    <pre className="whitespace-pre-wrap text-xs leading-relaxed font-mono text-gray-800 dark:text-gray-200 overflow-x-auto">
+                    <pre className="whitespace-pre-wrap text-sm leading-relaxed font-sans text-gray-800 dark:text-gray-200 overflow-x-auto">
                       {generatedPrompts.jsonPrompt}
                     </pre>
                   </div>
@@ -775,10 +786,10 @@ export default function Veo3PromptGeneratorPage() {
 
                 {/* Paragraph Format */}
                 {outputOptions.paragraphPrompt && generatedPrompts.paragraphPrompt && (
-                <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-4">
+                <div className="bg-gray-50 dark:bg-gray-900/20 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
                   <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-2">
-                        <Type className="h-4 w-4 text-blue-600" />
+                        <Type className="h-4 w-4 text-gray-600" />
                     <h4 className="font-bold text-sm flex items-center gap-2">
                       Paragraph Format (Creative)
                     </h4>
@@ -802,14 +813,16 @@ export default function Veo3PromptGeneratorPage() {
                           title: "Copied!",
                           description: "Paragraph format copied to clipboard",
                         })
+                        // Show toast notification after copying
+                        showToastAfterSuccess()
                       }}
                       className="text-xs h-8 px-3"
                     >
                         Copy
                     </Button>
                   </div>
-                  <div className="bg-white dark:bg-gray-900 rounded-lg p-3 border border-blue-200 dark:border-blue-700">
-                    <pre className="whitespace-pre-wrap text-xs leading-relaxed text-gray-800 dark:text-gray-200">
+                  <div className="bg-white dark:bg-gray-900 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
+                    <pre className="whitespace-pre-wrap text-sm leading-relaxed font-sans text-gray-800 dark:text-gray-200">
                       {generatedPrompts.paragraphPrompt}
                     </pre>
                   </div>
@@ -819,30 +832,38 @@ export default function Veo3PromptGeneratorPage() {
                 </div>
                 )}
 
-                {/* AI Status */}
-                {generatedPrompts.metadata && (
-                  <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 rounded-lg p-4">
-                    <div className="flex items-center justify-between text-sm">
-                      <div className="flex items-center gap-2">
-                        <Brain className="h-4 w-4 text-green-600" />
-                        <span className="text-green-800 dark:text-green-200">
-                          AI Powered by {generatedPrompts.metadata.model} ({generatedPrompts.metadata.mode} mode)
-                        </span>
-                      </div>
-                      <div className="text-green-600">
-                        {generatedPrompts.metadata.processingTime}ms
+                {/* AI Info Box */}
+                <div className="bg-purple-600 border border-purple-600 rounded-lg p-4">
+                  <div className="flex items-center justify-between text-white">
+                    <div className="flex items-center gap-3">
+                      <Brain className="h-5 w-5 text-white" />
+                      <div>
+                        <p className="text-sm font-medium">
+                          We trained our AI model over more than thousands of prompt to create the best prompting experience for you
+                        </p>
+                        <p className="text-xs mt-1 opacity-90">
+                          Made with ❤️ Love, Your One Share means a Lot
+                        </p>
                       </div>
                     </div>
-                    {generatedPrompts.metadata.outputsGenerated && (
-                      <div className="mt-2 text-xs text-green-700 dark:text-green-300">
-                        Generated: {Object.entries(generatedPrompts.metadata.outputsGenerated)
-                          .filter(([_, generated]) => generated)
-                          .map(([type, _]) => type.charAt(0).toUpperCase() + type.slice(1))
-                          .join(", ")}
-                      </div>
-                    )}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={async () => {
+                        await navigator.clipboard.writeText(window.location.href)
+                        toast({
+                          title: "Link Copied!",
+                          description: "Tool link copied to clipboard",
+                        })
+                        // Show toast notification after copying
+                        showToastAfterSuccess()
+                      }}
+                      className="text-xs h-8 px-3 bg-white text-purple-600 border-white hover:bg-gray-100"
+                    >
+                      Share
+                    </Button>
                   </div>
-                )}
+                </div>
               </div>
             )}
           </CardContent>
@@ -918,6 +939,12 @@ export default function Veo3PromptGeneratorPage() {
           </CardContent>
         </Card>
       </div>
+      
+      {/* Toast Notification */}
+      <ToastNotification 
+        isVisible={showToast} 
+        onClose={closeToast} 
+      />
     </div>
   )
 } 
