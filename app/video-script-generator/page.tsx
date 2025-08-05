@@ -5,16 +5,54 @@ import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-import { useState } from "react"
-import { Loader2, FileText, Lightbulb, Clock, Users, Target, Brain } from "lucide-react"
+import { useState, useEffect } from "react"
+import { Loader2, FileText, Brain, Copy, Check, History } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
+import { useToastNotification } from "@/hooks/use-toast-notification"
 import { ToolNavigation } from "@/components/tool-navigation"
+import { ToastNotification } from "@/components/ui/toast-notification"
+import { PromptHistory, addPromptToHistoryGlobal } from "@/components/prompt-history"
 
 export default function VideoScriptGeneratorPage() {
-  const [activeTab, setActiveTab] = useState("video-script")
+  const [activeTab, setActiveTab] = useState<"video-script" | "history">("video-script")
   const [isGenerating, setIsGenerating] = useState(false)
   const [generatedScript, setGeneratedScript] = useState("")
+  const [copied, setCopied] = useState(false)
   const { toast } = useToast()
+  const { showToast, showToastAfterSuccess, closeToast } = useToastNotification()
+
+  // Teaser prompts state
+  const [currentTeaserIndex, setCurrentTeaserIndex] = useState(0)
+  const teaserPrompts = [
+    "Crafting your perfect script...",
+    "Weaving words into stories...",
+    "Creating cinematic magic...",
+    "Building your video masterpiece..."
+  ]
+
+  // Function to play notification sound
+  const playNotificationSound = () => {
+    try {
+      const audio = new Audio('/sounds/toastnotifications.wav')
+      audio.volume = 0.5
+      audio.play().catch(error => {
+        console.log('Audio autoplay blocked or failed:', error)
+      })
+    } catch (error) {
+      console.log('Failed to play notification sound:', error)
+    }
+  }
+
+  // Cycle through teaser prompts when generating
+  useEffect(() => {
+    if (isGenerating) {
+      const interval = setInterval(() => {
+        setCurrentTeaserIndex((prev) => (prev + 1) % teaserPrompts.length)
+      }, 3000) // Change every 3 seconds
+      
+      return () => clearInterval(interval)
+    }
+  }, [isGenerating, teaserPrompts.length])
 
   // Form state
   const [formData, setFormData] = useState({
@@ -24,6 +62,9 @@ export default function VideoScriptGeneratorPage() {
     scriptStyle: "",
     language: "english",
   })
+
+  // Validation state
+  const [validationErrors, setValidationErrors] = useState<string[]>([])
 
   const audiences = [
     { value: "general", label: "General Audience" },
@@ -53,6 +94,7 @@ export default function VideoScriptGeneratorPage() {
 
   const languages = [
     { value: "english", label: "English" },
+    { value: "hindi", label: "Hindi" },
     { value: "vietnamese", label: "Vietnamese" },
     { value: "french", label: "French" },
     { value: "spanish", label: "Spanish" },
@@ -74,7 +116,7 @@ export default function VideoScriptGeneratorPage() {
     },
     {
       question: "What languages are supported?",
-      answer: "We support multiple languages including English, Vietnamese, French, Spanish, and German. More languages are being added regularly to serve our global user base."
+      answer: "We support multiple languages including English, Hindi, Vietnamese, French, Spanish, and German. More languages are being added regularly to serve our global user base."
     },
     {
       question: "How long does script generation take?",
@@ -86,12 +128,44 @@ export default function VideoScriptGeneratorPage() {
     }
   ]
 
+  // Validation function
+  const validateForm = () => {
+    const errors: string[] = []
+
+    if (!formData.videoTopic.trim()) {
+      errors.push("Video Topic & Main Characters is required")
+    }
+
+    if (!formData.audience) {
+      errors.push("Please select an Audience")
+    }
+
+    if (!formData.scriptLength) {
+      errors.push("Please select a Script Length")
+    }
+
+    if (!formData.scriptStyle) {
+      errors.push("Please select a Script Style")
+    }
+
+    if (!formData.language) {
+      errors.push("Please select a Language")
+    }
+
+    setValidationErrors(errors)
+    return errors.length === 0
+  }
+
   const generateScript = async () => {
-    if (!formData.videoTopic.trim() || !formData.audience || !formData.scriptLength || !formData.scriptStyle) {
+    // Clear previous errors
+    setValidationErrors([])
+
+    // Validate form
+    if (!validateForm()) {
       toast({
         title: "Missing Information",
-        description: "Please fill in all required fields.",
-        variant: "destructive",
+        description: `Please fill in the following fields: ${validationErrors.join(", ")}`,
+        variant: "default",
       })
       return
     }
@@ -110,10 +184,28 @@ export default function VideoScriptGeneratorPage() {
       if (!response.ok) throw new Error(data.error || "Failed to generate script")
 
       setGeneratedScript(data.script)
+      
+      // Save to prompt history
+      addPromptToHistoryGlobal(
+        data.script,
+        "video-script",
+        "video-script",
+        {
+          json: false,
+          paragraph: true
+        }
+      )
+      
+      // Play notification sound when script is generated successfully
+      playNotificationSound()
+      
       toast({
         title: "Script generated successfully!",
-        description: "Your video script is ready.",
+        description: "Your professional video script is ready.",
       })
+      
+      // Show bookmark toast notification
+      showToastAfterSuccess()
     } catch (error) {
       console.error("Error generating script:", error)
       toast({
@@ -135,6 +227,26 @@ export default function VideoScriptGeneratorPage() {
       language: "english",
     })
     setGeneratedScript("")
+    setValidationErrors([])
+    setCopied(false)
+  }
+
+  const copyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(generatedScript)
+      setCopied(true)
+      toast({
+        title: "Copied to clipboard!",
+        description: "The script has been copied to your clipboard.",
+      })
+      setTimeout(() => setCopied(false), 2000)
+    } catch (error) {
+      toast({
+        title: "Copy failed",
+        description: "Failed to copy to clipboard. Please copy manually.",
+        variant: "destructive",
+      })
+    }
   }
 
   return (
@@ -156,15 +268,157 @@ export default function VideoScriptGeneratorPage() {
         {/* Main Form Card - COMES FIRST */}
         <Card className="shadow-lg bg-white dark:bg-gray-800 mb-6 xs:mb-8 mx-1 xs:mx-2 sm:mx-0 rounded-lg">
           <CardContent className="p-4 xs:p-5 sm:p-6">
-            {/* Video Topic & Main Characters */}
+            {/* Mode Selection */}
+            <div className="flex items-center justify-center mb-6 gap-2">
+              <button
+                onClick={() => setActiveTab("video-script")}
+                className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200 ${
+                  activeTab === "video-script" 
+                    ? 'bg-blue-600 text-white' 
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <FileText className="h-4 w-4" />
+                  Video Script
+                </div>
+              </button>
+
+              <button
+                onClick={() => setActiveTab("history")}
+                className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200 ${
+                  activeTab === "history" 
+                    ? 'bg-blue-600 text-white' 
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <History className="h-4 w-4" />
+                  History
+                </div>
+              </button>
+            </div>
+
+            {/* Video Script Content */}
+            {activeTab === "video-script" && (
+              <div>
+                {/* Video Topic & Main Characters */}
             <div className="mb-4 xs:mb-6">
               <label className="text-sm xs:text-base font-bold mb-2 block">Video Topic & Main Characters:</label>
               <Textarea
                 value={formData.videoTopic}
                 onChange={(e) => setFormData({ ...formData, videoTopic: e.target.value })}
                 placeholder="Example: A short film about a lonely robot who finds a flower, featuring a curious robot and a vibrant, glowing flower."
-                className="min-h-[60px] xs:min-h-[80px] resize-none text-sm xs:text-base rounded-lg"
+                className="min-h-[120px] xs:min-h-[150px] sm:min-h-[180px] md:min-h-[200px] lg:min-h-[250px] resize-none text-sm xs:text-base rounded-lg p-4"
+                maxLength={1500}
               />
+              <div className="flex justify-between items-center mt-2">
+                <div className="text-xs text-gray-500 dark:text-gray-400">
+                  Describe your video concept, characters, and story in detail
+                </div>
+                <div className="text-xs text-gray-500 dark:text-gray-400">
+                  {formData.videoTopic.length}/1500
+                </div>
+              </div>
+            </div>
+
+            {/* Form Fields Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 xs:gap-5 mb-4 xs:mb-6">
+              {/* Audience */}
+              <div className="space-y-2">
+                <label className="text-sm xs:text-base font-bold">Audience:</label>
+                <Select
+                  value={formData.audience}
+                  onValueChange={(value) => setFormData({ ...formData, audience: value })}
+                >
+                  <SelectTrigger className="text-sm xs:text-base focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400">
+                    <SelectValue placeholder="Select audience" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+                    {audiences.map((audience) => (
+                      <SelectItem 
+                        key={audience.value} 
+                        value={audience.value}
+                        className="focus:bg-blue-50 dark:focus:bg-blue-900/20 focus:text-blue-700 dark:focus:text-blue-300 data-[state=checked]:bg-blue-50 dark:data-[state=checked]:bg-blue-900/20 data-[state=checked]:text-blue-700 dark:data-[state=checked]:text-blue-300"
+                      >
+                        {audience.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Script Length */}
+              <div className="space-y-2">
+                <label className="text-sm xs:text-base font-bold">Script Length:</label>
+                <Select
+                  value={formData.scriptLength}
+                  onValueChange={(value) => setFormData({ ...formData, scriptLength: value })}
+                >
+                  <SelectTrigger className="text-sm xs:text-base focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400">
+                    <SelectValue placeholder="Select length" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+                    {scriptLengths.map((length) => (
+                      <SelectItem 
+                        key={length.value} 
+                        value={length.value}
+                        className="focus:bg-blue-50 dark:focus:bg-blue-900/20 focus:text-blue-700 dark:focus:text-blue-300 data-[state=checked]:bg-blue-50 dark:data-[state=checked]:bg-blue-900/20 data-[state=checked]:text-blue-700 dark:data-[state=checked]:text-blue-300"
+                      >
+                        {length.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Script Style */}
+              <div className="space-y-2">
+                <label className="text-sm xs:text-base font-bold">Script Style:</label>
+                <Select
+                  value={formData.scriptStyle}
+                  onValueChange={(value) => setFormData({ ...formData, scriptStyle: value })}
+                >
+                  <SelectTrigger className="text-sm xs:text-base focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400">
+                    <SelectValue placeholder="Select style" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+                    {scriptStyles.map((style) => (
+                      <SelectItem 
+                        key={style.value} 
+                        value={style.value}
+                        className="focus:bg-blue-50 dark:focus:bg-blue-900/20 focus:text-blue-700 dark:focus:text-blue-300 data-[state=checked]:bg-blue-50 dark:data-[state=checked]:bg-blue-900/20 data-[state=checked]:text-blue-700 dark:data-[state=checked]:text-blue-300"
+                      >
+                        {style.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Language */}
+              <div className="space-y-2">
+                <label className="text-sm xs:text-base font-bold">Language:</label>
+                <Select
+                  value={formData.language}
+                  onValueChange={(value) => setFormData({ ...formData, language: value })}
+                >
+                  <SelectTrigger className="text-sm xs:text-base focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+                    {languages.map((lang) => (
+                      <SelectItem 
+                        key={lang.value} 
+                        value={lang.value}
+                        className="focus:bg-blue-50 dark:focus:bg-blue-900/20 focus:text-blue-700 dark:focus:text-blue-300 data-[state=checked]:bg-blue-50 dark:data-[state=checked]:bg-blue-900/20 data-[state=checked]:text-blue-700 dark:data-[state=checked]:text-blue-300"
+                      >
+                        {lang.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
             {/* Action Buttons */}
@@ -190,17 +444,67 @@ export default function VideoScriptGeneratorPage() {
                 onClick={clearForm}
                 variant="outline"
                 className="h-10 xs:h-12 px-4 xs:px-6 text-sm xs:text-base rounded-lg"
-                disabled={isGenerating || !formData.videoTopic.trim()}
+                disabled={isGenerating || (!formData.videoTopic.trim() && !generatedScript)}
               >
                 Clear
               </Button>
             </div>
 
+            {/* Animated Loading Bar */}
+            {isGenerating && (
+              <div className="mt-4 space-y-3 animate-in fade-in duration-300">
+                {/* Loading Bar - Full width with padding */}
+                <div className="px-2.5">
+                  <div className="loader-blue"></div>
+                </div>
+                
+                {/* Mini Teaser Prompts */}
+                <div className="text-center">
+                  <p className="text-sm text-blue-600 dark:text-blue-400 font-medium animate-pulse">
+                    {teaserPrompts[currentTeaserIndex]}
+                  </p>
+                </div>
+              </div>
+            )}
+
             {/* Result Container */}
             {generatedScript && (
               <div className="mt-4 xs:mt-6 p-4 xs:p-5 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                <h4 className="font-bold mb-2 text-sm xs:text-base">Generated Script:</h4>
-                <pre className="whitespace-pre-wrap text-sm xs:text-base overflow-x-auto">{generatedScript}</pre>
+                <div className="flex justify-between items-center mb-3">
+                  <h4 className="font-bold text-sm xs:text-base">Generated Script:</h4>
+                  <Button
+                    onClick={copyToClipboard}
+                    variant="outline"
+                    size="sm"
+                    className="flex items-center gap-2"
+                  >
+                    {copied ? (
+                      <>
+                        <Check className="h-4 w-4" />
+                        Copied!
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="h-4 w-4" />
+                        Copy
+                      </>
+                    )}
+                  </Button>
+                </div>
+                <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border">
+                  <div className="whitespace-pre-wrap text-sm xs:text-base overflow-x-auto text-gray-800 dark:text-gray-200 font-sans leading-relaxed">
+                    {generatedScript}
+                  </div>
+                </div>
+              </div>
+            )}
+              </div>
+            )}
+
+            {/* History Content */}
+            {activeTab === "history" && (
+              <div className="space-y-4">
+                <PromptHistory />
               </div>
             )}
           </CardContent>
@@ -264,34 +568,24 @@ export default function VideoScriptGeneratorPage() {
           </CardHeader>
           <CardContent className="p-4 xs:p-5">
             <Accordion type="single" collapsible className="w-full">
-              <AccordionItem value="item-1">
-                <AccordionTrigger className="text-sm xs:text-base">What types of videos can I create scripts for?</AccordionTrigger>
-                <AccordionContent className="text-sm text-gray-600 dark:text-gray-400">
-                  Our Video Script Generator can create scripts for various video types including YouTube videos, TikTok content, Instagram Reels, educational videos, promotional content, storytelling videos, and more. Just describe your concept and the AI will adapt the script accordingly.
-                </AccordionContent>
-              </AccordionItem>
-              <AccordionItem value="item-2">
-                <AccordionTrigger className="text-sm xs:text-base">How long are the generated scripts?</AccordionTrigger>
-                <AccordionContent className="text-sm text-gray-600 dark:text-gray-400">
-                  Script length varies based on your input and requirements. You can specify if you need a short 30-second script or a longer 5-10 minute video script. The AI will adjust the content and detail level accordingly.
-                </AccordionContent>
-              </AccordionItem>
-              <AccordionItem value="item-3">
-                <AccordionTrigger className="text-sm xs:text-base">Can I edit the generated script?</AccordionTrigger>
-                <AccordionContent className="text-sm text-gray-600 dark:text-gray-400">
-                  Absolutely! The generated script is a starting point that you can copy, edit, and customize to match your specific needs, style, and brand voice. Feel free to modify dialogue, add details, or adjust the structure.
-                </AccordionContent>
-              </AccordionItem>
-              <AccordionItem value="item-4">
-                <AccordionTrigger className="text-sm xs:text-base">Is the script suitable for commercial use?</AccordionTrigger>
-                <AccordionContent className="text-sm text-gray-600 dark:text-gray-400">
-                  Yes, the scripts generated by our tool are free to use for both personal and commercial projects. However, we recommend reviewing and customizing the content to ensure it aligns with your brand guidelines and legal requirements.
-                </AccordionContent>
-              </AccordionItem>
+              {faqs.map((faq, index) => (
+                <AccordionItem key={index} value={`item-${index}`}>
+                  <AccordionTrigger className="text-sm xs:text-base">{faq.question}</AccordionTrigger>
+                  <AccordionContent className="text-sm text-gray-600 dark:text-gray-400">
+                    {faq.answer}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
             </Accordion>
           </CardContent>
         </Card>
       </div>
+      
+      {/* Toast Notification */}
+      <ToastNotification 
+        isVisible={showToast} 
+        onClose={closeToast} 
+      />
     </div>
   )
 }

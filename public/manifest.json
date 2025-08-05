@@ -1,0 +1,108 @@
+{
+  "name": "Veo3 Prompt Generator - Free AI Video Prompt Creator",
+  "short_name": "Veo3 Generator",
+  "description": "Create professional Veo3 prompts and video scripts with our free AI-powered generator. Perfect for content creators, marketers, and businesses.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#6366f1",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en-US",
+  "dir": "ltr",
+  "categories": ["productivity", "utilities", "business", "education"],
+  "icons": [
+    {
+      "src": "/images/favicon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/images/favicon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/images/veo3-logo-new.png",
+      "sizes": "72x72",
+      "type": "image/png"
+    },
+    {
+      "src": "/images/veo3-logo-new.png",
+      "sizes": "96x96",
+      "type": "image/png"
+    },
+    {
+      "src": "/images/veo3-logo-new.png",
+      "sizes": "128x128",
+      "type": "image/png"
+    },
+    {
+      "src": "/images/veo3-logo-new.png",
+      "sizes": "144x144",
+      "type": "image/png"
+    },
+    {
+      "src": "/images/veo3-logo-new.png",
+      "sizes": "152x152",
+      "type": "image/png"
+    },
+    {
+      "src": "/images/veo3-logo-new.png",
+      "sizes": "384x384",
+      "type": "image/png"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/images/screenshot-desktop.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Veo3 Prompt Generator Desktop Interface"
+    },
+    {
+      "src": "/images/screenshot-mobile.png",
+      "sizes": "750x1334",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Veo3 Prompt Generator Mobile Interface"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Veo3 Prompt Generator",
+      "short_name": "Veo3",
+      "description": "Create Veo3 prompts quickly",
+      "url": "/veo3-prompt-generator",
+      "icons": [
+        {
+          "src": "/images/veo3-logo-new.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Video Script Generator",
+      "short_name": "Script",
+      "description": "Generate video scripts",
+      "url": "/video-script-generator",
+      "icons": [
+        {
+          "src": "/images/veo3-logo-new.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false,
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  }
+}

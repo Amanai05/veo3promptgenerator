@@ -9,7 +9,7 @@ interface Veo3PromptData {
   }
 }
 
-export class AIService extends BaseAIService {
+export class Veo3PromptService extends BaseAIService {
   async generateVeo3Prompt(userInput: string): Promise<AIResponse> {
     const startTime = Date.now()
 
@@ -116,7 +116,7 @@ Think like a professional cinematographer and director.`
       }
 
     } catch (error) {
-      console.error("AI service error:", error)
+      console.error("Veo3 prompt generation error:", error)
       return {
         success: false,
         error: error instanceof Error ? error.message : "Unknown error occurred"
@@ -125,5 +125,4 @@ Think like a professional cinematographer and director.`
   }
 }
 
-export const aiService = new AIService()
-
+export const veo3PromptService = new Veo3PromptService() 

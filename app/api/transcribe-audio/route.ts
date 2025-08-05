@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { aiService } from "@/lib/ai-service"
+import { analysisService } from "@/lib/services/analysis-service"
 
 export async function POST(request: NextRequest) {
   try {
@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
     // Remove data URL prefix if present
     const base64Data = audioData.replace(/^data:audio\/[a-z0-9]+;base64,/, "")
 
-    const result = await aiService.transcribeAudio(base64Data, language, format)
+    const result = await analysisService.transcribeAudio(base64Data, format || "audio/wav")
 
     if (!result.success) {
       return NextResponse.json({ error: result.error }, { status: 500 })
@@ -20,10 +20,8 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      transcription: result.data.transcription,
-      language: result.data.language,
-      format: result.data.format,
-      fallbackUsed: result.fallbackUsed,
+      transcription: result.data?.transcription,
+      metadata: result.data?.metadata,
     })
   } catch (error) {
     console.error("Audio transcription error:", error)

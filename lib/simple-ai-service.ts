@@ -2,172 +2,42 @@
 // START OF CORRECTED simple-ai-service.ts
 // ========================================================================
 
-interface AIResponse {
-    success: boolean;
-    data?: any;
-    error?: string;
-  }
-  
-  // NOTE: This interface is not currently used by the corrected JSON logic,
-  // but is kept for the paragraph prompt.
-  interface SimpleVeo3PromptData {
-    jsonPrompt: string;
-    paragraphPrompt: string;
-    metadata: {
-      model: string;
-      processingTime: number;
-    };
-  }
-  
-  class GeminiAPI {
-    private apiKey: string;
-    private baseUrl = "https://generativelanguage.googleapis.com/v1beta";
-  
-    constructor(apiKey: string) {
-      this.apiKey = apiKey;
-    }
-  
-    async generateContent(prompt: string): Promise<string> {
-      const response = await fetch(`${this.baseUrl}/models/gemini-2.5-pro:generateContent?key=${this.apiKey}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: {
-            temperature: 0.8, // FIX: Slightly increased temperature to encourage more creative enhancement.
-            topK: 40,
-            topP: 0.95,
-            maxOutputTokens: 2048, // FIX: Increased token limit for potentially more detailed JSON.
-          },
-        }),
-      });
-  
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Gemini API error: ${response.status} - ${errorText}`);
-      }
-  
-      const data = await response.json();
-      // The response text is now guaranteed to be a JSON string.
-      return data.candidates[0]?.content?.parts[0]?.text || "";
-    }
-  }
-  
-  class OpenRouterAPI {
-      // ... (This class remains unchanged, but be aware it might not support response_mime_type, making it a less reliable fallback for JSON)
-      private apiKey: string
-      private baseUrl = "https://openrouter.ai/api/v1"
-    
-      constructor(apiKey: string) {
-        this.apiKey = apiKey
-      }
-    
-      async generateContent(prompt: string): Promise<string> {
-        const response = await fetch(`${this.baseUrl}/chat/completions`, {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${this.apiKey}`,
-            "Content-Type": "application/json",
-            "HTTP-Referer": process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
-            "X-Title": "veo3promptgenerator",
-          },
-          body: JSON.stringify({
-            model: "google/gemini-2.5-pro",
-            messages: [{ role: "user", content: prompt }],
-            max_tokens: 2048,
-            temperature: 0.7,
-          }),
-        })
-    
-        if (!response.ok) {
-          const errorText = await response.text()
-          throw new Error(`OpenRouter API error: ${response.status} - ${errorText}`)
-        }
-    
-        const data = await response.json()
-        return data.choices[0]?.message?.content || ""
-      }
-  }
-  
-  export class SimpleAIService {
-    private geminiAPI?: GeminiAPI;
-    private openRouterAPI?: OpenRouterAPI;
-  
-    constructor() {
-      // ... (Constructor remains unchanged)
-      const geminiKey = process.env.GEMINI_API_KEY
-      const openRouterKey = process.env.OPENROUTER_API_KEY
-  
-      console.log("Simple AI Service Initialization:")
-      console.log("  - GEMINI_API_KEY:", geminiKey ? "Set" : "Missing")
-      console.log("  - OPENROUTER_API_KEY:", openRouterKey ? "Set" : "Missing")
-  
-      if (geminiKey && geminiKey !== "your_gemini_api_key_here") {
-        this.geminiAPI = new GeminiAPI(geminiKey)
-      }
-      if (openRouterKey && openRouterKey !== "your_openrouter_api_key_here") {
-        this.openRouterAPI = new OpenRouterAPI(openRouterKey)
-      }
-  
-      if (!this.geminiAPI && !this.openRouterAPI) {
-        console.warn("No API keys configured. Simple mode AI features will not work.")
-      }
-    }
-  
-    private async tryWithFallback(prompt: string): Promise<{ result: string; model: string }> {
-      // ... (tryWithFallback remains unchanged)
-      if (this.geminiAPI) {
-          try {
-            console.log("Using Gemini API for simple mode...")
-            const result = await this.geminiAPI.generateContent(prompt)
-            return { result, model: "gemini-2.5-pro" }
-          } catch (error) {
-            console.warn("Gemini API failed, trying OpenRouter...")
-            if (this.openRouterAPI) {
-              const result = await this.openRouterAPI.generateContent(prompt)
-              return { result, model: "openrouter/gemini-2.5-flash" }
-            } else {
-              throw error
-            }
-          }
-        } else if (this.openRouterAPI) {
-          console.log("Using OpenRouter API for simple mode...")
-          const result = await this.openRouterAPI.generateContent(prompt)
-          return { result, model: "openrouter/gemini-2.5-flash" }
-        } else {
-          throw new Error("No AI service available")
-        }
-    }
-  
-    async generateJSONPrompt(userInput: string, dialogueSetting: string = "no"): Promise<AIResponse> {
-      const startTime = Date.now()
+import { BaseAIService, AIResponse, AIMetadata } from './ai-base';
 
-      if (!this.geminiAPI && !this.openRouterAPI) {
-        return {
-          success: false,
-          error: "No AI service available. Please configure API keys in .env.local file."
-        }
-      }
+interface SimpleVeo3PromptData {
+  jsonPrompt: string;
+  paragraphPrompt: string;
+  metadata: AIMetadata;
+}
 
-      // Add dialogue-specific instructions based on user selection
-      let dialogueInstructions = ""
-      switch (dialogueSetting) {
-        case "yes":
-          dialogueInstructions = "create the detailed prompt with the dialogue provided by the users"
-          break
-        case "ai":
-          dialogueInstructions = "if the prompt provided by the user doesn't have any dialogue add few dialogue relevant to the content or the user prompt the audio dialogue length should not exceed more than 5 seconds"
-          break
-        case "no":
-          dialogueInstructions = "remove if there are any dialogue in the video prompt and give an good veo3 prompt without any dialogues"
-          break
-        default:
-          dialogueInstructions = "remove if there are any dialogue in the video prompt and give an good veo3 prompt without any dialogues"
-      }
+export class SimpleAIService extends BaseAIService {
+  async generateJSONPrompt(userInput: string, dialogueSetting: string = "no"): Promise<AIResponse> {
+    const startTime = Date.now();
 
-      const jsonSystemPrompt = `You are "Cine-Core 8", a hyper-specialized AI prompt engineering system. Your sole mission is to function as a world-class cinematographer and translate a user's simple creative idea into a single, dense, and technically flawless 8-second JSON prompt for Google's Veo3 video generation model. You must not just translate the user's request; you must ENHANCE it with your expert knowledge of cinematic techniques to create a truly compelling visual scene.
+    if (!this.hasValidAPIs()) {
+      return {
+        success: false,
+        error: "No AI service available. Please configure API keys in .env.local file."
+      };
+    }
+
+    // Add dialogue-specific instructions based on user selection
+    let dialogueInstructions = "";
+    switch (dialogueSetting) {
+      case "yes":
+        dialogueInstructions = "create the detailed prompt with the dialogue provided by the users";
+        break;
+      case "ai":
+        dialogueInstructions = "if the prompt provided by the user doesn't have any dialogue add few dialogue relevant to the content or the user prompt the audio dialogue length should not exceed more than 5 seconds";
+        break;
+      case "no":
+        dialogueInstructions = "remove if there are any dialogue in the video prompt and give an good veo3 prompt without any dialogues";
+        break;
+      default:
+        dialogueInstructions = "remove if there are any dialogue in the video prompt and give an good veo3 prompt without any dialogues";
+    }
+
+    const jsonSystemPrompt = `You are "Cine-Core 8", a hyper-specialized AI prompt engineering system. Your sole mission is to function as a world-class cinematographer and translate a user's simple creative idea into a single, dense, and technically flawless 8-second JSON prompt for Google's Veo3 video generation model. You must not just translate the user's request; you must ENHANCE it with your expert knowledge of cinematic techniques to create a truly compelling visual scene.
 
 **DIALOGUE INSTRUCTION: ${dialogueInstructions}**
 
@@ -241,122 +111,67 @@ interface AIResponse {
 ### **V. YOUR TASK**
 Now, process the following user's idea. Think deeply about their request, apply your artistic philosophy to enhance their vision, and generate the perfect JSON output, adhering to all immutable laws and the required schema.
 
-**User Input:** ${userInput}`
-  
+**User Input:** ${userInput}`;
+
+    try {
+      const { result, metadata } = await this.tryWithRobustFallback(jsonSystemPrompt);
+      console.log("JSON AI Response:", result);
+
+      // Robust JSON parsing with fallback
+      let jsonPrompt;
       try {
-        const { result, model } = await this.tryWithFallback(jsonSystemPrompt);
-        console.log("JSON AI Response:", result);
-  
-        // FIX: Replaced the entire fragile parsing block with a single, robust try/catch.
-        // This is now possible because we are using `response_mime_type: "application/json"`.
-        let jsonPrompt;
-        try {
-          // First, try to parse the result directly as JSON
-          JSON.parse(result);
-          jsonPrompt = result;
-        } catch (e) {
-          console.log("Direct JSON parsing failed, looking for JSON in response...");
-          
-          // Look for JSON in the response (in case AI added explanatory text)
-          const jsonStart = result.indexOf('{');
-          const jsonEnd = result.lastIndexOf('}') + 1;
-          
-          if (jsonStart !== -1 && jsonEnd > jsonStart) {
-            try {
-              const potentialJson = result.substring(jsonStart, jsonEnd);
-              JSON.parse(potentialJson); // Validate it's proper JSON
-              jsonPrompt = potentialJson;
-              console.log("Found valid JSON in response");
-            } catch (parseError) {
-              console.error("JSON found but invalid, using fallback");
-              throw parseError;
-            }
-          } else {
-            console.error("No JSON found in response, using fallback");
-            throw new Error("No JSON found in response");
+        jsonPrompt = this.parseJSONResponse(result);
+      } catch (parseError) {
+        console.error("JSON parsing failed, using fallback:", parseError);
+        jsonPrompt = this.createFallbackJSON(userInput);
+      }
+
+      return {
+        success: true,
+        data: {
+          jsonPrompt,
+          metadata: {
+            ...metadata,
+            processingTime: Date.now() - startTime
           }
         }
-        
-        // If we still don't have valid JSON, use the fallback
-        if (!jsonPrompt) {
-          console.error("CRITICAL: AI returned invalid JSON despite instructions. Using fallback.");
-          
-          // FIX: The fallback now uses the CORRECT schema and follows the rules.
-          const fallbackJson = {
-            shot_concept: `A cinematic 8-second shot based on the idea: ${userInput}.`,
-            duration_seconds: 8,
-            composition: {
-              shot_type: "Medium Shot",
-              camera_dynamics: "Smooth and stable camera work."
-            },
-            subject: {
-              description: `The main subject is: ${userInput}.`,
-              action: "The subject performs a key action related to the concept.",
-              dialogue: ""
-            },
-            atmosphere: {
-              setting: "A setting appropriate to the user's concept.",
-              lighting_style: "Professional cinematic lighting.",
-              color_palette: "A color palette that matches the mood of the scene."
-            },
-            audio_design: {
-              sound_effects: "Appropriate ambient sounds and sound effects.",
-              music_cue: "Background music that fits the scene's emotion."
-            }
-          };
-          jsonPrompt = JSON.stringify(fallbackJson, null, 2);
-        }
-  
-        const processingTime = Date.now() - startTime;
-  
-        return {
-          success: true,
-          data: {
-            jsonPrompt,
-            metadata: {
-              model,
-              processingTime,
-            },
-          },
-        };
-      } catch (error) {
-        console.error("JSON generation error:", error);
-        return {
-          success: false,
-          error: error instanceof Error ? error.message : "Unknown error occurred",
-        };
-      }
+      };
+    } catch (error) {
+      console.error("JSON generation error:", error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error occurred"
+      };
     }
-  
-    // NOTE: The paragraph prompt generation is a separate concern.
-    // The issues identified primarily affect the JSON generation logic.
-    async generateParagraphPrompt(userInput: string, dialogueSetting: string = "no"): Promise<AIResponse> {
-      const startTime = Date.now()
+  }
 
-      if (!this.geminiAPI && !this.openRouterAPI) {
-        return {
-          success: false,
-          error: "No AI service available. Please configure API keys in .env.local file."
-        }
-      }
+  async generateParagraphPrompt(userInput: string, dialogueSetting: string = "no"): Promise<AIResponse> {
+    const startTime = Date.now();
 
-      // Add dialogue-specific instructions based on user selection
-      let dialogueInstructions = ""
-      switch (dialogueSetting) {
-        case "yes":
-          dialogueInstructions = "create the detailed prompt with the dialogue provided by the users"
-          break
-        case "ai":
-          dialogueInstructions = "if the prompt provided by the user doesn't have any dialogue add few dialogue relevant to the content or the user prompt the audio dialogue length should not exceed more than 5 seconds"
-          break
-        case "no":
-          dialogueInstructions = "remove if there are any dialogue in the video prompt and give an good veo3 prompt without any dialogues"
-          break
-        default:
-          dialogueInstructions = "remove if there are any dialogue in the video prompt and give an good veo3 prompt without any dialogues"
-      }
+    if (!this.hasValidAPIs()) {
+      return {
+        success: false,
+        error: "No AI service available. Please configure API keys in .env.local file."
+      };
+    }
 
-      const paragraphSystemPrompt = `You are an expert Veo3 video concept and prompt engineer. Your role is to take a user's initial video idea and transform it into a production-ready, highly optimized paragraph prompt for Google's Veo3 AI video generation platform.
+    // Add dialogue-specific instructions based on user selection
+    let dialogueInstructions = "";
+    switch (dialogueSetting) {
+      case "yes":
+        dialogueInstructions = "create the detailed prompt with the dialogue provided by the users";
+        break;
+      case "ai":
+        dialogueInstructions = "if the prompt provided by the user doesn't have any dialogue add few dialogue relevant to the content or the user prompt the audio dialogue length should not exceed more than 5 seconds";
+        break;
+      case "no":
+        dialogueInstructions = "remove if there are any dialogue in the video prompt and give an good veo3 prompt without any dialogues";
+        break;
+      default:
+        dialogueInstructions = "remove if there are any dialogue in the video prompt and give an good veo3 prompt without any dialogues";
+    }
+
+    const paragraphSystemPrompt = `You are an expert Veo3 video concept and prompt engineer. Your role is to take a user's initial video idea and transform it into a production-ready, highly optimized paragraph prompt for Google's Veo3 AI video generation platform.
 
 **DIALOGUE INSTRUCTION: ${dialogueInstructions}**
 
@@ -382,41 +197,37 @@ User Input: ${userInput}
     *   **Audio Elements:** Specific details about the sound effects, music, and dialogue (if any), *appropriate for the desired style*.
     *   **Technical Specifications:** The paragraph MUST implicitly convey the following technical specifications: 4K resolution, 30fps, 16:9 aspect ratio, professional quality optimized for Veo3 AI generation.
 
-Write in a natural, engaging, and descriptive style that accurately reflects the user's intended style and content. The paragraph should be ready for immediate use in Veo3, requiring no further editing or additions.`
-  
-      try {
-        const { result, model } = await this.tryWithFallback(paragraphSystemPrompt)
-        console.log("Paragraph AI Response:", result)
-  
-        // Use the full response as paragraph
-        const paragraphPrompt = result || `A dynamic 8-second video scene featuring ${userInput}. The environment is carefully crafted to match the user's vision, with detailed subject descriptions that capture the essence of the concept. The camera work employs professional techniques with smooth movements and strategic angles that enhance the narrative. Lighting is designed to create the perfect mood and atmosphere, while audio elements include carefully selected sound effects and background music that complement the visual storytelling. The scene is optimized for 4K resolution at 30fps with a 16:9 aspect ratio, ensuring professional quality output ready for immediate use in Veo3 AI generation.`
-  
-        const processingTime = Date.now() - startTime
-  
-        return {
-          success: true,
-          data: {
-            paragraphPrompt,
-            metadata: {
-              model,
-              processingTime
-            }
+Write in a natural, engaging, and descriptive style that accurately reflects the user's intended style and content. The paragraph should be ready for immediate use in Veo3, requiring no further editing or additions.`;
+
+    try {
+      const { result, metadata } = await this.tryWithRobustFallback(paragraphSystemPrompt);
+      console.log("Paragraph AI Response:", result);
+
+      // Use the full response as paragraph, with fallback
+      const paragraphPrompt = result || this.createFallbackParagraph(userInput);
+
+      return {
+        success: true,
+        data: {
+          paragraphPrompt,
+          metadata: {
+            ...metadata,
+            processingTime: Date.now() - startTime
           }
         }
-  
-      } catch (error) {
-        console.error("Paragraph generation error:", error)
-        return {
-          success: false,
-          error: error instanceof Error ? error.message : "Unknown error occurred"
-        }
-      }
+      };
+    } catch (error) {
+      console.error("Paragraph generation error:", error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error occurred"
+      };
     }
   }
-  
-  export const simpleAIService = new SimpleAIService();
-  
-  
-  // ========================================================================
-  // END OF CORRECTED simple-ai-service.ts
-  // ========================================================================
+}
+
+export const simpleAIService = new SimpleAIService();
+
+// ========================================================================
+// END OF CORRECTED simple-ai-service.ts
+// ========================================================================

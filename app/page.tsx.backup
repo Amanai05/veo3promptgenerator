@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     siteName: "Veo3 Prompt Generator",
     images: [
       {
-        url: "/images/og-image-1200x630.png",
+        url: "/images/veo3-logo-new.png",
         width: 1200,
         height: 630,
         alt: "Veo3 Prompt Generator - AI Video Prompt Creator",
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Veo3 Prompt Generator - Free AI Video Prompt Creator",
     description: "Create professional Veo3 prompts and video scripts with our free AI-powered generator.",
-    images: ["/images/og-image-1200x630.png"],
+    images: ["/images/veo3-logo-new.png"],
     creator: "@veo3promptgen",
     site: "@veo3promptgen",
   },
@@ -89,7 +89,7 @@ export default function HomePage() {
             "@type": "Organization",
             "name": "Veo3 Prompt Generator",
             "url": "https://veo3promptgenerator.com",
-            "logo": "https://veo3promptgenerator.com/images/og-image-1200x630.png",
+            "logo": "https://veo3promptgenerator.com/images/veo3-logo-new.png",
             "description": "Free AI-powered Veo3 prompt generator for content creators, marketers, and businesses",
             "sameAs": [
               "https://twitter.com/veo3promptgen",
@@ -162,7 +162,7 @@ export default function HomePage() {
               "Advanced Customization",
               "Real-time Generation"
             ],
-            "screenshot": "https://veo3promptgenerator.com/images/og-image-1200x630.png",
+            "screenshot": "https://veo3promptgenerator.com/images/veo3-logo-new.png",
             "softwareVersion": "1.0.0",
             "releaseNotes": "Latest version with enhanced AI capabilities and multi-API support",
             "downloadUrl": "https://veo3promptgenerator.com",

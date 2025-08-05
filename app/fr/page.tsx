@@ -4,8 +4,8 @@ import { HomeSections } from "@/components/home-sections"
 export default function FrenchHomePage() {
   return (
     <main>
-      <MainHero locale="fr" />
-      <HomeSections locale="fr" />
+      <MainHero />
+      <HomeSections />
     </main>
   )
 }

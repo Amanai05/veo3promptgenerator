@@ -1,135 +1,17 @@
-import { NextResponse } from "next/server"
-
-interface AIResponse {
-  success: boolean;
-  data?: any;
-  error?: string;
-}
+import { NextResponse } from "next/server";
+import { BaseAIService, AIResponse, AIMetadata } from './ai-base';
 
 interface AdvancedVeo3PromptData {
   jsonPrompt: string;
   paragraphPrompt: string;
-  metadata: {
-    model: string;
-    processingTime: number;
-  };
+  metadata: AIMetadata;
 }
 
-class GeminiAPI {
-  private apiKey: string;
-  private baseUrl = "https://generativelanguage.googleapis.com/v1beta";
-
-  constructor(apiKey: string) {
-    this.apiKey = apiKey;
-  }
-
-  async generateContent(prompt: string): Promise<string> {
-    const response = await fetch(`${this.baseUrl}/models/gemini-2.5-pro:generateContent?key=${this.apiKey}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: {
-          temperature: 0.8,
-          topK: 40,
-          topP: 0.95,
-          maxOutputTokens: 2048,
-        },
-      }),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Gemini API error: ${response.status} - ${errorText}`);
-    }
-
-    const data = await response.json();
-    return data.candidates[0]?.content?.parts[0]?.text || "";
-  }
-}
-
-class OpenRouterAPI {
-  private apiKey: string;
-  private baseUrl = "https://openrouter.ai/api/v1";
-
-  constructor(apiKey: string) {
-    this.apiKey = apiKey;
-  }
-
-  async generateContent(prompt: string): Promise<string> {
-    const response = await fetch(`${this.baseUrl}/chat/completions`, {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${this.apiKey}`,
-        "Content-Type": "application/json",
-        "HTTP-Referer": process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
-        "X-Title": "veo3promptgenerator",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-pro",
-        messages: [{ role: "user", content: prompt }],
-        max_tokens: 2048,
-        temperature: 0.7,
-      }),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`OpenRouter API error: ${response.status} - ${errorText}`);
-    }
-
-    const data = await response.json();
-    return data.choices[0]?.message?.content || "";
-  }
-}
-
-export class AdvancedAIService {
-  private geminiAPI?: GeminiAPI;
-  private openRouterAPI?: OpenRouterAPI;
-
-  constructor() {
-    const geminiApiKey = process.env.GEMINI_API_KEY;
-    const openRouterApiKey = process.env.OPENROUTER_API_KEY;
-
-    if (geminiApiKey) {
-      this.geminiAPI = new GeminiAPI(geminiApiKey);
-    }
-
-    if (openRouterApiKey) {
-      this.openRouterAPI = new OpenRouterAPI(openRouterApiKey);
-    }
-
-    console.log("Advanced AI Service Initialization:");
-    console.log("  - GEMINI_API_KEY:", geminiApiKey ? "Set" : "Not set");
-    console.log("  - OPENROUTER_API_KEY:", openRouterApiKey ? "Set" : "Not set");
-  }
-
-  private async tryWithFallback(prompt: string): Promise<{ result: string; model: string }> {
-    try {
-      if (this.geminiAPI) {
-        console.log("Using Gemini API for advanced mode...");
-        const result = await this.geminiAPI.generateContent(prompt);
-        return { result, model: "gemini-2.5-pro" };
-      }
-    } catch (error) {
-      console.log("Gemini API failed, trying OpenRouter...");
-    }
-
-    if (this.openRouterAPI) {
-      console.log("Using OpenRouter API for advanced mode...");
-      const result = await this.openRouterAPI.generateContent(prompt);
-      return { result, model: "openrouter-gemini-2.5-pro" };
-    }
-
-    throw new Error("No AI service available");
-  }
-
+export class AdvancedAIService extends BaseAIService {
   async generateJSONPrompt(formData: any, dialogueSetting: string = "no"): Promise<AIResponse> {
     const startTime = Date.now();
 
-    if (!this.geminiAPI && !this.openRouterAPI) {
+    if (!this.hasValidAPIs()) {
       return {
         success: false,
         error: "No AI service available. Please configure API keys in .env.local file."
@@ -219,105 +101,33 @@ Process the provided form data with cinematic expertise. Enhance every element w
 **Form Data:** ${JSON.stringify(formData, null, 2)}`;
 
     try {
-      const { result, model } = await this.tryWithFallback(advancedJSONSystemPrompt);
+      const { result, metadata } = await this.tryWithRobustFallback(advancedJSONSystemPrompt);
       console.log("Advanced JSON AI Response:", result);
 
-      // Robust JSON parsing
+      // Robust JSON parsing with fallback
       let jsonPrompt;
       try {
-        JSON.parse(result);
-        jsonPrompt = result;
-      } catch (e) {
-        console.log("Direct JSON parsing failed, looking for JSON in response...");
-        
-        const jsonStart = result.indexOf('{');
-        const jsonEnd = result.lastIndexOf('}') + 1;
-        
-        if (jsonStart !== -1 && jsonEnd > jsonStart) {
-          try {
-            const potentialJson = result.substring(jsonStart, jsonEnd);
-            JSON.parse(potentialJson);
-            jsonPrompt = potentialJson;
-          } catch (e2) {
-            console.log("JSON extraction failed, using fallback...");
-            jsonPrompt = JSON.stringify({
-              shot_concept: `Advanced 8-second cinematic shot featuring ${formData.mainSubject} performing ${formData.sceneAction}.`,
-              duration_seconds: 8,
-              composition: {
-                shot_type: "Professional Cinematic Shot",
-                camera_dynamics: formData.cameraMovement || "Smooth and dynamic camera work"
-              },
-              subject: {
-                description: `Enhanced ${formData.mainSubject} with professional details.`,
-                action: formData.sceneAction,
-                dialogue: ""
-              },
-              atmosphere: {
-                setting: formData.otherDetails || "Professional cinematic environment",
-                lighting_style: "Professional cinematic lighting",
-                color_palette: "Cinematic color grading"
-              },
-              audio_design: {
-                sound_effects: "Professional sound design",
-                music_cue: "Cinematic score"
-              },
-              technical_specs: {
-                resolution: "4K",
-                frame_rate: 30,
-                aspect_ratio: "16:9",
-                subtitles: formData.subtitles === "yes"
-              }
-            }, null, 2);
-          }
-        } else {
-          jsonPrompt = JSON.stringify({
-            shot_concept: `Advanced 8-second cinematic shot featuring ${formData.mainSubject} performing ${formData.sceneAction}.`,
-            duration_seconds: 8,
-            composition: {
-              shot_type: "Professional Cinematic Shot",
-              camera_dynamics: formData.cameraMovement || "Smooth and dynamic camera work"
-            },
-            subject: {
-              description: `Enhanced ${formData.mainSubject} with professional details.`,
-              action: formData.sceneAction,
-              dialogue: ""
-            },
-            atmosphere: {
-              setting: formData.otherDetails || "Professional cinematic environment",
-              lighting_style: "Professional cinematic lighting",
-              color_palette: "Cinematic color grading"
-            },
-            audio_design: {
-              sound_effects: "Professional sound design",
-              music_cue: "Cinematic score"
-            },
-            technical_specs: {
-              resolution: "4K",
-              frame_rate: 30,
-              aspect_ratio: "16:9",
-              subtitles: formData.subtitles === "yes"
-            }
-          }, null, 2);
-        }
+        jsonPrompt = this.parseJSONResponse(result);
+      } catch (parseError) {
+        console.error("JSON parsing failed, using fallback:", parseError);
+        jsonPrompt = this.createFallbackJSON(formData.mainSubject || "main subject", formData);
       }
-
-      const processingTime = Date.now() - startTime;
 
       return {
         success: true,
         data: {
           jsonPrompt,
           metadata: {
-            model,
-            processingTime,
-          },
-        },
+            ...metadata,
+            processingTime: Date.now() - startTime
+          }
+        }
       };
     } catch (error) {
       console.error("Advanced JSON generation error:", error);
       return {
         success: false,
-        error: error instanceof Error ? error.message : "Unknown error occurred",
+        error: error instanceof Error ? error.message : "Unknown error occurred"
       };
     }
   }
@@ -325,7 +135,7 @@ Process the provided form data with cinematic expertise. Enhance every element w
   async generateParagraphPrompt(formData: any, dialogueSetting: string = "no"): Promise<AIResponse> {
     const startTime = Date.now();
 
-    if (!this.geminiAPI && !this.openRouterAPI) {
+    if (!this.hasValidAPIs()) {
       return {
         success: false,
         error: "No AI service available. Please configure API keys in .env.local file."
@@ -385,25 +195,22 @@ Process the provided form data with cinematic expertise. Enhance every element w
 Write in a natural, engaging, and descriptive style that accurately reflects the form data and target audience. The paragraph should be ready for immediate use in Veo3.`;
 
     try {
-      const { result, model } = await this.tryWithFallback(advancedParagraphSystemPrompt);
+      const { result, metadata } = await this.tryWithRobustFallback(advancedParagraphSystemPrompt);
       console.log("Advanced Paragraph AI Response:", result);
 
-      // Use the full response as paragraph
-      const paragraphPrompt = result || `A professional 8-second cinematic video featuring ${formData.mainSubject} performing ${formData.sceneAction}. The environment is carefully crafted based on the provided details, with enhanced subject descriptions that capture the essence of the concept. The camera work employs professional techniques incorporating ${formData.cameraMovement || "smooth movements"} and strategic angles that enhance the narrative. Lighting is designed to create the perfect mood matching the ${formData.videoStyle || "cinematic"} style for the ${formData.targetAudience || "target"} audience. Audio elements include carefully selected sound effects and background music that complement the visual storytelling. The scene is optimized for 4K resolution at 30fps with a 16:9 aspect ratio, ensuring professional quality output ready for immediate use in Veo3 AI generation.`;
-
-      const processingTime = Date.now() - startTime;
+      // Use the full response as paragraph, with fallback
+      const paragraphPrompt = result || this.createFallbackParagraph(formData.mainSubject || "main subject", formData);
 
       return {
         success: true,
         data: {
           paragraphPrompt,
           metadata: {
-            model,
-            processingTime
+            ...metadata,
+            processingTime: Date.now() - startTime
           }
         }
       };
-
     } catch (error) {
       console.error("Advanced paragraph generation error:", error);
       return {

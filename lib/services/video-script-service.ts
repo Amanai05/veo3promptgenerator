@@ -1,0 +1,212 @@
+import { BaseAIService, type AIResponse } from "@/lib/ai-base"
+
+interface VideoScriptFormData {
+  videoTopic: string
+  audience: string
+  scriptLength: string
+  scriptStyle: string
+  language: string
+}
+
+export class VideoScriptService extends BaseAIService {
+  async generateVideoScript(formData: VideoScriptFormData): Promise<AIResponse> {
+    const startTime = Date.now()
+
+    if (!this.hasValidAPIs()) {
+      return {
+        success: false,
+        error: "No AI service available. Please configure API keys in .env.local file."
+      }
+    }
+
+    // Calculate timing based on script length
+    const getTiming = (length: string) => {
+      switch (length) {
+        case "15-30s": return { opening: "0:00-0:05", main: "0:05-0:25", closing: "0:25-0:30" }
+        case "30-60s": return { opening: "0:00-0:08", main: "0:08-0:52", closing: "0:52-1:00" }
+        case "1-2min": return { opening: "0:00-0:15", main: "0:15-1:45", closing: "1:45-2:00" }
+        case "2-5min": return { opening: "0:00-0:20", main: "0:20-4:40", closing: "4:40-5:00" }
+        case "5-10min": return { opening: "0:00-0:30", main: "0:30-9:30", closing: "9:30-10:00" }
+        default: return { opening: "0:00-0:10", main: "0:10-0:50", closing: "0:50-1:00" }
+      }
+    }
+
+    // Get audience-specific guidance
+    const getAudienceGuidance = (audience: string) => {
+      switch (audience) {
+        case "general":
+          return "Use clear, accessible language that appeals to a broad audience. Focus on universal themes and relatable content that everyone can understand and appreciate."
+        case "teens":
+          return "Use energetic, trendy language with current slang and references. Keep it fast-paced and engaging. Focus on social media trends, peer relationships, and contemporary youth culture."
+        case "young-adults":
+          return "Use modern, professional language with contemporary references. Balance entertainment with informative content. Focus on career, lifestyle, personal growth, and current trends."
+        case "professionals":
+          return "Use formal, authoritative language with industry-specific terminology. Focus on expertise, credibility, actionable insights, and professional development."
+        case "parents":
+          return "Use warm, supportive language with family-oriented themes. Focus on practical advice, safety, family values, and relatable parenting experiences."
+        case "seniors":
+          return "Use clear, respectful language with traditional values. Focus on wisdom, experience, community connections, and topics relevant to older adults."
+        default:
+          return "Use clear, engaging language that connects with the target audience."
+      }
+    }
+
+    // Get style-specific guidance
+    const getStyleGuidance = (style: string) => {
+      switch (style) {
+        case "conversational":
+          return "Write in a natural, friendly tone as if speaking directly to the viewer. Use contractions, questions, casual language, and create a personal connection."
+        case "professional":
+          return "Use formal, structured language with clear organization. Maintain authority and credibility throughout. Use industry terminology and professional standards."
+        case "energetic":
+          return "Use dynamic, high-energy language with exclamation points and action words. Create excitement and urgency. Use vibrant, engaging descriptions."
+        case "educational":
+          return "Use clear, instructional language with step-by-step explanations. Include examples, practical applications, and educational value."
+        case "storytelling":
+          return "Use narrative techniques with character development, plot structure, and emotional arcs. Create compelling stories with clear beginning, middle, and end."
+        case "promotional":
+          return "Use persuasive language with benefits-focused messaging. Include calls-to-action and compelling offers. Create urgency and desire."
+        default:
+          return "Use engaging, appropriate language for the content type."
+      }
+    }
+
+    // Get language-specific guidance
+    const getLanguageGuidance = (language: string) => {
+      switch (language) {
+        case "english":
+          return "Write in clear, professional English with proper grammar and punctuation. Use appropriate cultural references and idioms."
+        case "hindi":
+          return "Write in Hindi with proper grammar, Devanagari script, and cultural context. Use appropriate Hindi expressions, idioms, and cultural references. Include both Hindi dialogue and English translations where needed."
+        case "vietnamese":
+          return "Write in Vietnamese with appropriate cultural context and language nuances. Use proper Vietnamese grammar and cultural references."
+        case "french":
+          return "Write in French with proper grammar, accents, and cultural references. Use appropriate French expressions and cultural context."
+        case "spanish":
+          return "Write in Spanish with appropriate regional variations and cultural context. Use proper Spanish grammar and cultural references."
+        case "german":
+          return "Write in German with proper grammar, formal structure, and cultural references. Use appropriate German expressions and cultural context."
+        default:
+          return "Write in clear, professional language appropriate for the target audience."
+      }
+    }
+
+    const timing = getTiming(formData.scriptLength)
+    const audienceGuidance = getAudienceGuidance(formData.audience)
+    const styleGuidance = getStyleGuidance(formData.scriptStyle)
+    const languageGuidance = getLanguageGuidance(formData.language)
+
+    const systemPrompt = `You are "ScriptMaster Pro", an expert video script writer and content strategist with over 15 years of experience in film, television, and digital media. Create a comprehensive, professional video script based on the provided specifications.
+
+**VIDEO SPECIFICATIONS:**
+- Topic: ${formData.videoTopic}
+- Target Audience: ${formData.audience}
+- Script Length: ${formData.scriptLength}
+- Style: ${formData.scriptStyle}
+- Language: ${formData.language}
+
+**AUDIENCE GUIDANCE:**
+${audienceGuidance}
+
+**STYLE GUIDANCE:**
+${styleGuidance}
+
+**LANGUAGE GUIDANCE:**
+${languageGuidance}
+
+**SCRIPT REQUIREMENTS:**
+- Create a compelling, engaging script that resonates with the ${formData.audience} audience
+- Follow the ${formData.scriptStyle} style throughout the entire script
+- Optimize for the specified duration (${formData.scriptLength})
+- Include clear scene descriptions, dialogue, and visual cues
+- Add precise timing markers for each section
+- Include comprehensive production notes for visuals and audio
+- Write in ${formData.language} with appropriate cultural context
+- Ensure the script is production-ready and professional
+
+**LANGUAGE-SPECIFIC INSTRUCTIONS:**
+${formData.language === "hindi" ? "For Hindi scripts: Write dialogue in Hindi using Devanagari script. Include English translations in parentheses where needed for clarity. Use appropriate Hindi cultural references and expressions." : ""}
+
+**SCRIPT STRUCTURE:**
+1. Opening Hook (${timing.opening}) - Grab attention immediately with compelling visuals and audio
+2. Main Content (${timing.main}) - Deliver the core message with detailed scenes and dialogue
+3. Call to Action (${timing.closing}) - Drive engagement with a compelling conclusion
+
+**OUTPUT FORMAT - IMPORTANT:**
+Write ONLY the script content in clean, plain text format. Do NOT include any header information, metadata, or section titles. Start directly with the opening scene content.
+
+OPENING - ${timing.opening}
+Write a complete, attention-grabbing opening that hooks the ${formData.audience} audience immediately. Include:
+- Detailed visual descriptions with camera angles and movements
+- Specific dialogue or voice-over content in ${formData.language}
+- Audio cues and background music suggestions
+- Timing for each element within this section
+
+MAIN CONTENT - ${timing.main}
+Write a complete main content section with detailed scenes, dialogue, and visual cues optimized for ${formData.scriptStyle} style. Include:
+- Multiple scene descriptions with specific timing
+- Character dialogue or voice-over content in ${formData.language}
+- Visual transitions and camera movements
+- Audio elements and background music
+- Emotional beats and story progression
+
+CALL TO ACTION - ${timing.closing}
+Write a complete closing with a compelling call to action that drives engagement with the ${formData.audience} audience. Include:
+- Final visual elements and camera work
+- Compelling dialogue or voice-over in ${formData.language}
+- Clear call-to-action messaging
+- Emotional resolution or next steps
+
+PRODUCTION NOTES
+
+VISUAL NOTES:
+- Camera angles and movements for each scene
+- Lighting setup and color schemes
+- Props, set design, and location details
+- Visual effects and transitions
+- Costume and makeup considerations
+
+AUDIO NOTES:
+- Background music style and mood
+- Sound effects and ambient audio
+- Voice-over tone, pace, and delivery
+- Audio mixing and balance recommendations
+- Music cues and timing
+
+TECHNICAL NOTES:
+- Platform-specific requirements (YouTube, TikTok, Instagram, etc.)
+- Aspect ratio and resolution specifications
+- Quality and performance optimization tips
+- File format and delivery specifications
+- Accessibility considerations
+
+IMPORTANT: Write ONLY the script content starting with the opening scene. Do NOT include any header information, metadata, or section titles. Do NOT use any markdown formatting, asterisks (*), hashtags (#), or special characters. Write a COMPLETE script with ALL sections filled out in detail. Do not cut off or leave sections incomplete.`
+
+    try {
+      const { result, metadata } = await this.tryWithRobustFallback(systemPrompt)
+
+      console.log("Video Script AI Response:", result)
+
+      return {
+        success: true,
+        data: {
+          script: result,
+          metadata: {
+            ...metadata,
+            processingTime: Date.now() - startTime,
+            formData
+          }
+        }
+      }
+
+    } catch (error) {
+      console.error("Video script generation error:", error)
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error occurred"
+      }
+    }
+  }
+}
+
+export const videoScriptService = new VideoScriptService()

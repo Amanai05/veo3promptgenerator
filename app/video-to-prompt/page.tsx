@@ -1,121 +1,177 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { useState, useCallback } from "react"
-import { Loader2, Upload, FileVideo, X, Brain, Eye, Zap, Target, Video } from "lucide-react"
-import { useToast } from "@/hooks/use-toast"
-import { ToolNavigation } from "@/components/tool-navigation"
 import { useDropzone } from "react-dropzone"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { useToast } from "@/hooks/use-toast"
+import { Copy, Upload, Video, Loader2, Brain, X, FileVideo } from "lucide-react"
+import { ToolNavigation } from "@/components/tool-navigation"
+
+// File validation constants
+const MAX_FILE_SIZE = 100 * 1024 * 1024 // 100MB
+const MAX_DURATION_SECONDS = 120 // 2 minutes
+
+interface VideoAnalysisResult {
+  analysis: string
+  metadata: {
+    model: string
+    processingTime: number
+  }
+}
 
 export default function VideoToPromptPage() {
-  const [activeTab, setActiveTab] = useState("video-to-prompt")
+  const [videoFile, setVideoFile] = useState<File | null>(null)
   const [isProcessing, setIsProcessing] = useState(false)
-  const [generatedPrompt, setGeneratedPrompt] = useState("")
-  const [uploadedVideo, setUploadedVideo] = useState<File | null>(null)
+  const [analysisResult, setAnalysisResult] = useState<VideoAnalysisResult | null>(null)
   const { toast } = useToast()
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     if (acceptedFiles.length > 0) {
       const file = acceptedFiles[0]
-      if (file.type.startsWith('video/')) {
-        setUploadedVideo(file)
-        toast({
-          title: "Video uploaded successfully!",
-          description: `${file.name} has been uploaded.`,
-        })
-      } else {
+      
+      // Validate file type
+      if (!file.type.startsWith('video/')) {
         toast({
           title: "Invalid file type",
-          description: "Please upload a video file.",
+          description: "Please upload a video file (MP4, MOV, AVI, etc.)",
           variant: "destructive",
         })
+        return
       }
+
+      // Validate file size
+      if (file.size > MAX_FILE_SIZE) {
+        toast({
+          title: "File too large",
+          description: `Please upload a video smaller than 100MB. Current size: ${(file.size / (1024 * 1024)).toFixed(1)}MB`,
+          variant: "destructive",
+        })
+        return
+      }
+
+      setVideoFile(file)
+      setAnalysisResult(null)
+      toast({
+        title: "Video uploaded successfully!",
+        description: `${file.name} has been uploaded.`,
+      })
     }
   }, [toast])
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: {
-      'video/*': ['.mp4', '.avi', '.mov', '.wmv', '.flv', '.webm']
+      'video/*': ['.mp4', '.avi', '.mov', '.wmv', '.flv', '.webm', '.mkv']
     },
     maxFiles: 1,
-    maxSize: 100 * 1024 * 1024 // 100MB
+    maxSize: MAX_FILE_SIZE
   })
 
   const removeVideo = () => {
-    setUploadedVideo(null)
-    setGeneratedPrompt("")
+    setVideoFile(null)
+    setAnalysisResult(null)
   }
 
-  const generatePrompt = async () => {
-    if (!uploadedVideo) {
+  const validateForm = () => {
+    if (!videoFile) {
       toast({
         title: "No video uploaded",
         description: "Please upload a video file first.",
         variant: "destructive",
       })
-      return
+      return false
     }
 
+    return true
+  }
+
+  const analyzeVideo = async () => {
+    if (!validateForm()) return
+
     setIsProcessing(true)
-    setGeneratedPrompt("")
+    setAnalysisResult(null)
 
     try {
-      const formData = new FormData()
-      formData.append('video', uploadedVideo)
+      // Mock processing for now - backend will be implemented separately
+      await new Promise(resolve => setTimeout(resolve, 2000))
+      
+      // Mock result
+      const mockResult = {
+        analysis: "This is a sample video analysis. The backend will be implemented separately to provide real AI-powered video analysis.",
+        metadata: {
+          model: "Backend will be implemented",
+          processingTime: 2000
+        }
+      }
 
-      const response = await fetch("/api/analyze-video", {
-        method: "POST",
-        body: formData,
-      })
+      setAnalysisResult(mockResult)
 
-      const data = await response.json()
-      if (!response.ok) throw new Error(data.error || "Failed to analyze video")
-
-      setGeneratedPrompt(data.prompt)
       toast({
-        title: "Prompt generated successfully!",
-        description: "Your video prompt is ready.",
+        title: "Video analysis completed!",
+        description: "Backend will be implemented separately.",
       })
     } catch (error) {
-      console.error("Error generating prompt:", error)
+      console.error("Analysis error:", error)
       toast({
-        title: "Generation failed",
-        description: error instanceof Error ? error.message : "Failed to generate prompt. Please try again.",
-        variant: "destructive",
+        title: "Analysis failed",
+        description: "Backend will be implemented separately.",
+        variant: "destructive"
       })
     } finally {
       setIsProcessing(false)
     }
   }
 
+  const copyToClipboard = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text)
+      toast({
+        title: "Copied to clipboard",
+        description: "The analysis has been copied to your clipboard.",
+      })
+    } catch (error) {
+      toast({
+        title: "Copy failed",
+        description: "Failed to copy to clipboard. Please copy manually.",
+        variant: "destructive"
+      })
+    }
+  }
+
   const clearAll = () => {
-    setUploadedVideo(null)
-    setGeneratedPrompt("")
+    setVideoFile(null)
+    setAnalysisResult(null)
+  }
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes === 0) return '0 Bytes'
+    const k = 1024
+    const sizes = ['Bytes', 'KB', 'MB', 'GB']
+    const i = Math.floor(Math.log(bytes) / Math.log(k))
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
   }
 
   const faqs = [
     {
       question: "What video formats are supported?",
-      answer: "We support all major video formats including MP4, AVI, MOV, WMV, FLV, and WebM. Files up to 100MB can be uploaded for analysis."
+      answer: "We support all major video formats including MP4, AVI, MOV, WMV, FLV, WebM, and MKV. Files up to 100MB and 2 minutes can be uploaded for analysis."
     },
     {
       question: "How does the AI analyze my video?",
-      answer: "Our advanced AI analyzes your video by examining scenes, objects, actions, colors, lighting, and audio elements to create comprehensive prompts that capture the essence of your content."
+      answer: "Our advanced AI analyzes your video by examining scenes, objects, actions, colors, lighting, and audio elements to create comprehensive analysis that captures the essence of your content."
     },
     {
-      question: "What types of prompts will I get?",
-      answer: "You'll receive detailed prompts including scene descriptions, object identification, action sequences, mood analysis, and technical specifications suitable for AI video generation platforms."
+      question: "What type of analysis will I get?",
+      answer: "You'll receive detailed video analysis including scene breakdown, visual elements, camera techniques, lighting analysis, audio elements, and technical specifications."
     },
     {
       question: "How accurate is the video analysis?",
-      answer: "Our AI achieves 95%+ accuracy in video analysis, with advanced computer vision and machine learning algorithms that understand context, emotions, and visual elements."
+      answer: "Our AI achieves high accuracy in video analysis, with advanced computer vision and machine learning algorithms that understand context, emotions, and visual elements."
     },
     {
-      question: "Can I use the generated prompts for commercial projects?",
-      answer: "Yes! All generated prompts are yours to use for any purpose, including commercial video production, client work, and creative projects."
+      question: "Can I use the generated analysis for commercial projects?",
+      answer: "Yes! All generated analysis is yours to use for any purpose, including commercial video production, client work, and creative projects."
     },
     {
       question: "How long does video analysis take?",
@@ -133,7 +189,7 @@ export default function VideoToPromptPage() {
 
         {/* Description */}
         <p className="text-gray-700 dark:text-gray-300 text-center mb-4 xs:mb-6 max-w-2xl mx-auto text-sm xs:text-base px-2">
-          Transform your existing videos into detailed AI prompts. Upload a video and get comprehensive prompts for AI video generation platforms.
+          Transform your existing videos into detailed AI prompts. Upload a video and get comprehensive analysis for AI video generation platforms.
         </p>
 
         {/* Navigation Tabs */}
@@ -158,22 +214,27 @@ export default function VideoToPromptPage() {
                 <p className="text-sm xs:text-base text-gray-600 dark:text-gray-400">
                   {isDragActive ? "Drop the video here..." : "Drag & drop a video file here, or click to select"}
                 </p>
-                <p className="text-xs text-gray-500 mt-1">Supports MP4, MOV, AVI (Max 100MB)</p>
+                <p className="text-xs text-gray-500 mt-1">
+                  Supports MP4, MOV, AVI, WebM, MKV (Max 100MB, 2 minutes)
+                </p>
               </div>
             </div>
 
             {/* Uploaded Video Display */}
-            {uploadedVideo && (
+            {videoFile && (
               <div className="mb-4 xs:mb-6 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
-                    <Video className="h-4 w-4 text-green-600" />
-                    <span className="text-sm xs:text-base font-medium">{uploadedVideo.name}</span>
+                    <FileVideo className="h-4 w-4 text-green-600" />
+                    <div>
+                      <span className="text-sm xs:text-base font-medium">{videoFile.name}</span>
+                      <p className="text-xs text-gray-500">{formatFileSize(videoFile.size)}</p>
+                    </div>
                   </div>
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => setUploadedVideo(null)}
+                    onClick={removeVideo}
                     className="text-red-600 hover:text-red-700 h-8 px-2"
                   >
                     <X className="h-4 w-4" />
@@ -185,8 +246,8 @@ export default function VideoToPromptPage() {
             {/* Action Buttons */}
             <div className="flex gap-3 xs:gap-4">
               <Button
-                onClick={generatePrompt}
-                disabled={isProcessing || !uploadedVideo}
+                onClick={analyzeVideo}
+                disabled={isProcessing || !videoFile}
                 className="flex-1 bg-green-600 hover:bg-green-700 text-white h-10 xs:h-12 text-sm xs:text-base font-medium rounded-lg"
               >
                 {isProcessing ? (
@@ -197,7 +258,7 @@ export default function VideoToPromptPage() {
                 ) : (
                   <>
                     <Brain className="mr-2 h-4 w-4" />
-                    Generate Prompt
+                    Analyze Video
                   </>
                 )}
               </Button>
@@ -205,17 +266,53 @@ export default function VideoToPromptPage() {
                 onClick={clearAll}
                 variant="outline"
                 className="h-10 xs:h-12 px-4 xs:px-6 text-sm xs:text-base rounded-lg"
-                disabled={isProcessing || (!uploadedVideo && !generatedPrompt)}
+                disabled={isProcessing || (!videoFile && !analysisResult)}
               >
                 Clear
               </Button>
             </div>
 
-            {/* Result Container */}
-            {generatedPrompt && (
-              <div className="mt-4 xs:mt-6 p-4 xs:p-5 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                <h4 className="font-bold mb-2 text-sm xs:text-base">Generated Prompt:</h4>
-                <pre className="whitespace-pre-wrap text-sm xs:text-base overflow-x-auto">{generatedPrompt}</pre>
+            {/* Processing Animation */}
+            {isProcessing && (
+              <div className="mt-4 space-y-3 animate-in fade-in duration-300">
+                <div className="px-2.5">
+                  <div className="loader-green"></div>
+                </div>
+                <div className="text-center">
+                  <p className="text-sm text-green-600 dark:text-green-400 font-medium animate-pulse">
+                    Analyzing video content with AI...
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Results Container */}
+            {analysisResult && (
+              <div className="mt-4 xs:mt-6 space-y-4">
+                <div className="p-4 xs:p-5 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                  <div className="flex justify-between items-center mb-3">
+                    <h4 className="font-bold text-sm xs:text-base">Video Analysis:</h4>
+                    <Button
+                      onClick={() => copyToClipboard(analysisResult.analysis)}
+                      variant="outline"
+                      size="sm"
+                      className="flex items-center gap-2"
+                    >
+                      <Copy className="h-4 w-4" />
+                      Copy
+                    </Button>
+                  </div>
+                  <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border">
+                    <div className="whitespace-pre-wrap text-sm xs:text-base text-gray-800 dark:text-gray-200 leading-relaxed">
+                      {analysisResult.analysis}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Processing Metadata */}
+                <div className="text-xs text-gray-500 dark:text-gray-400 text-center">
+                  Processed with {analysisResult.metadata.model} in {analysisResult.metadata.processingTime}ms
+                </div>
               </div>
             )}
           </CardContent>
@@ -237,7 +334,7 @@ export default function VideoToPromptPage() {
                 </div>
                 <div>
                   <h4 className="font-semibold text-sm xs:text-base mb-1">Upload Your Video</h4>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Upload any video file (MP4, MOV, AVI) up to 100MB. Our system will analyze the visual content.</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Upload any video file (MP4, MOV, AVI) up to 100MB and 2 minutes. Our system will analyze the visual content.</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
@@ -246,7 +343,7 @@ export default function VideoToPromptPage() {
                 </div>
                 <div>
                   <h4 className="font-semibold text-sm xs:text-base mb-1">AI Analysis</h4>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Our advanced AI extracts key visual elements, scenes, objects, and actions from your video.</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Our advanced AI will extract key visual elements, scenes, objects, and actions from your video.</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
@@ -254,8 +351,8 @@ export default function VideoToPromptPage() {
                   <span className="text-green-600 font-bold text-sm">3</span>
                 </div>
                 <div>
-                  <h4 className="font-semibold text-sm xs:text-base mb-1">Generate Prompt</h4>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Get a comprehensive prompt that can be used to generate similar or enhanced video content with AI platforms.</p>
+                  <h4 className="font-semibold text-sm xs:text-base mb-1">Get Detailed Analysis</h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Receive comprehensive video analysis including scene breakdown, visual elements, camera techniques, lighting, and technical specifications.</p>
                 </div>
               </div>
             </div>
@@ -267,7 +364,7 @@ export default function VideoToPromptPage() {
           <CardContent className="p-4 xs:p-5">
             <h3 className="text-lg xs:text-xl font-bold mb-3 xs:mb-4 text-green-600">About Video to Prompt Generator</h3>
             <p className="text-sm xs:text-base text-gray-700 dark:text-gray-300 leading-relaxed">
-              Our Video to Prompt Generator is an innovative AI-powered tool that transforms your existing videos into detailed prompts for AI video generation platforms. By analyzing your video content, our advanced AI extracts key visual elements, scenes, objects, and actions to create comprehensive prompts that can be used to generate similar or enhanced video content. This tool is perfect for content creators, marketers, and video producers who want to leverage their existing content to create new AI-generated videos with consistent style and messaging.
+              Our Video to Prompt Generator is an innovative AI-powered tool that transforms your existing videos into detailed analysis for AI video generation platforms. By analyzing your video content, our advanced AI extracts key visual elements, scenes, objects, and actions to create comprehensive analysis that can be used to generate similar or enhanced video content. This tool is perfect for content creators, marketers, and video producers who want to leverage their existing content to create new AI-generated videos with consistent style and messaging.
             </p>
           </CardContent>
         </Card>
@@ -278,32 +375,14 @@ export default function VideoToPromptPage() {
             <CardTitle className="text-lg xs:text-xl sm:text-2xl font-bold text-green-600">Frequently Asked Questions</CardTitle>
           </CardHeader>
           <CardContent className="p-4 xs:p-5">
-            <Accordion type="single" collapsible className="w-full">
-              <AccordionItem value="item-1">
-                <AccordionTrigger className="text-sm xs:text-base">What video formats are supported?</AccordionTrigger>
-                <AccordionContent className="text-sm text-gray-600 dark:text-gray-400">
-                  We support most common video formats including MP4, MOV, AVI, and more. The maximum file size is 100MB to ensure fast processing and analysis.
-                </AccordionContent>
-              </AccordionItem>
-              <AccordionItem value="item-2">
-                <AccordionTrigger className="text-sm xs:text-base">How accurate are the generated prompts?</AccordionTrigger>
-                <AccordionContent className="text-sm text-gray-600 dark:text-gray-400">
-                  Our AI provides highly accurate analysis of visual elements, scenes, and actions. The generated prompts capture the essence and key components of your original video for effective AI video generation.
-                </AccordionContent>
-              </AccordionItem>
-              <AccordionItem value="item-3">
-                <AccordionTrigger className="text-sm xs:text-base">Can I use the prompts with any AI video platform?</AccordionTrigger>
-                <AccordionContent className="text-sm text-gray-600 dark:text-gray-400">
-                  Yes! The generated prompts are designed to be compatible with most AI video generation platforms including Runway, Pika Labs, Veo3, and others. You can modify the prompts as needed for specific platforms.
-                </AccordionContent>
-              </AccordionItem>
-              <AccordionItem value="item-4">
-                <AccordionTrigger className="text-sm xs:text-base">Is my video content secure?</AccordionTrigger>
-                <AccordionContent className="text-sm text-gray-600 dark:text-gray-400">
-                  Absolutely. We prioritize your privacy and security. Videos are processed securely and are not stored permanently. We only analyze the content to generate prompts and do not retain your video files.
-                </AccordionContent>
-              </AccordionItem>
-            </Accordion>
+            <div className="space-y-4">
+              {faqs.map((faq, index) => (
+                <div key={index} className="border-b border-gray-200 dark:border-gray-700 pb-4 last:border-b-0">
+                  <h4 className="font-semibold text-sm xs:text-base mb-2">{faq.question}</h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">{faq.answer}</p>
+                </div>
+              ))}
+            </div>
           </CardContent>
         </Card>
       </div>

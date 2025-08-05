@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
+import { videoScriptService } from "@/lib/services/video-script-service"
 
 export async function POST(request: NextRequest) {
   try {
@@ -8,43 +9,44 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
     }
 
-    // Simulate AI processing for video script generation
-    const script = `VIDEO SCRIPT - ${scriptLength.toUpperCase()}
+    // Validate input length
+    if (videoTopic.length > 1500) {
+      return NextResponse.json({ error: "Video topic is too long. Maximum 1500 characters allowed." }, { status: 400 })
+    }
 
-TOPIC: ${videoTopic}
-AUDIENCE: ${audience}
-STYLE: ${scriptStyle}
-LANGUAGE: ${language}
+    console.log("Generating video script with AI...")
+    console.log("Form data:", { videoTopic, audience, scriptLength, scriptStyle, language })
 
-[OPENING - 0:00-0:03]
-Hook: Start with an attention-grabbing statement or question related to your topic.
+    // Use dedicated video script service
+    const result = await videoScriptService.generateVideoScript({
+      videoTopic,
+      audience,
+      scriptLength,
+      scriptStyle,
+      language
+    })
 
-[MAIN CONTENT - 0:03-${scriptLength === "15-30s" ? "0:25" : scriptLength === "30-60s" ? "0:50" : "1:45"}]
-Key Points:
-1. Introduce the main subject/product
-2. Highlight key benefits or features
-3. Address audience pain points
-4. Provide value or entertainment
+    if (!result.success) {
+      console.error("AI service error:", result.error)
+      return NextResponse.json({ 
+        error: result.error || "Failed to generate script with AI" 
+      }, { status: 500 })
+    }
 
-[CALL TO ACTION - Final 5 seconds]
-Clear, compelling action for viewers to take next.
+    console.log("Script generated successfully")
+    console.log("Model used:", result.data.metadata.model)
+    console.log("Processing time:", result.data.metadata.processingTime, "ms")
 
-VISUAL NOTES:
-- Use engaging visuals that support the narrative
-- Include text overlays for key points
-- Maintain consistent branding throughout
-- Consider platform-specific requirements
+    return NextResponse.json({ 
+      script: result.data.script,
+      metadata: result.data.metadata
+    })
 
-AUDIO NOTES:
-- Background music should match the ${scriptStyle} tone
-- Ensure clear audio quality
-- Add sound effects where appropriate
-
-This script is optimized for ${audience} and follows ${scriptStyle} storytelling principles.`
-
-    return NextResponse.json({ script })
   } catch (error) {
     console.error("Error generating video script:", error)
-    return NextResponse.json({ error: "Failed to generate script" }, { status: 500 })
+    return NextResponse.json({ 
+      error: "Failed to generate script",
+      details: error instanceof Error ? error.message : "Unknown error"
+    }, { status: 500 })
   }
 }

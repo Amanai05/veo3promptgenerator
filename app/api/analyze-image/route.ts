@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { aiService } from "@/lib/ai-service"
+import { analysisService } from "@/lib/services/analysis-service"
 
 export async function POST(request: NextRequest) {
   try {
@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
     // Remove data URL prefix if present
     const base64Data = imageData.replace(/^data:image\/[a-z]+;base64,/, "")
 
-    const result = await aiService.analyzeImage(base64Data, mimeType)
+    const result = await analysisService.analyzeImage(base64Data, mimeType)
 
     if (!result.success) {
       return NextResponse.json({ error: result.error }, { status: 500 })
@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
       success: true,
       jsonOutput: result.data.jsonOutput,
       paragraphOutput: result.data.paragraphOutput,
-      fallbackUsed: result.fallbackUsed,
+      metadata: result.data.metadata,
     })
   } catch (error) {
     console.error("Image analysis error:", error)

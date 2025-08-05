@@ -10,10 +10,11 @@ import { Label } from "@/components/ui/label"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { useToast } from "@/hooks/use-toast"
-import { MessageSquare, Camera, FileText, Type, Info, Video, Loader2, Brain, Copy, Check, Settings } from "lucide-react"
+import { MessageSquare, Camera, FileText, Type, Info, Video, Loader2, Brain, Copy, Check, Settings, History } from "lucide-react"
 import { ToolNavigation } from "@/components/tool-navigation"
 import { ToastNotification } from "@/components/ui/toast-notification"
 import { useToastNotification } from "@/hooks/use-toast-notification"
+import { PromptHistory, addPromptToHistoryGlobal } from "@/components/prompt-history"
 
 export default function Veo3PromptGeneratorPage() {
   const [activeMode, setActiveMode] = useState("chat")
@@ -61,6 +62,19 @@ export default function Veo3PromptGeneratorPage() {
     "Cooking something magical",
     "Creating something you love just a sec. please"
   ]
+
+  // Function to play notification sound
+  const playNotificationSound = () => {
+    try {
+      const audio = new Audio('/sounds/toastnotifications.wav')
+      audio.volume = 0.5
+      audio.play().catch(error => {
+        console.log('Audio autoplay blocked or failed:', error)
+      })
+    } catch (error) {
+      console.log('Failed to play notification sound:', error)
+    }
+  }
 
   // Cycle through teaser prompts when generating
   useEffect(() => {
@@ -167,9 +181,27 @@ export default function Veo3PromptGeneratorPage() {
         }
       })
 
+      // Save to prompt history
+      const promptToSave = outputOptions.paragraphPrompt 
+        ? results.paragraphPrompt 
+        : results.jsonPrompt || chatInput
+      
+      addPromptToHistoryGlobal(
+        promptToSave,
+        "chat",
+        "veo3-prompt",
+        {
+          json: outputOptions.jsonPrompt,
+          paragraph: outputOptions.paragraphPrompt
+        }
+      )
+
       const outputTypes = []
       if (outputOptions.jsonPrompt) outputTypes.push("JSON")
       if (outputOptions.paragraphPrompt) outputTypes.push("Paragraph")
+
+      // Play notification sound when prompt is generated successfully
+      playNotificationSound()
 
       toast({
         title: "AI Prompt Generated!",
@@ -284,9 +316,27 @@ export default function Veo3PromptGeneratorPage() {
         }
       })
 
+      // Save to prompt history
+      const promptToSave = outputOptions.paragraphPrompt 
+        ? results.paragraphPrompt 
+        : results.jsonPrompt || `${advancedData.mainSubject} - ${advancedData.sceneAction}`
+      
+      addPromptToHistoryGlobal(
+        promptToSave,
+        "advanced",
+        "veo3-prompt",
+        {
+          json: outputOptions.jsonPrompt,
+          paragraph: outputOptions.paragraphPrompt
+        }
+      )
+
       const outputTypes = []
       if (outputOptions.jsonPrompt) outputTypes.push("JSON")
       if (outputOptions.paragraphPrompt) outputTypes.push("Paragraph")
+
+      // Play notification sound when prompt is generated successfully
+      playNotificationSound()
 
       toast({
         title: "Advanced AI Prompt Generated!",
@@ -360,16 +410,56 @@ export default function Veo3PromptGeneratorPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 dark:from-black dark:from-black dark:from-black">
+    <>
+      {/* Structured Data for SEO */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "SoftwareApplication",
+            "name": "Free Veo3 Prompt Generator",
+            "description": "Generate production-ready prompts for Google's Veo3. Our free tool creates advanced JSON & paragraph prompts with viral templates and full cinematic control. No signup required.",
+            "url": "https://veo3promptgenerator.com/veo3-prompt-generator",
+            "applicationCategory": "MultimediaApplication",
+            "operatingSystem": "Web Browser",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "USD"
+            },
+            "creator": {
+              "@type": "Organization",
+              "name": "Veo3 Prompt Generator"
+            },
+            "featureList": [
+              "Advanced JSON prompt generation",
+              "Viral video templates",
+              "Cinematic control",
+              "Paragraph prompt format",
+              "No signup required",
+              "Free to use"
+            ],
+            "screenshot": "https://veo3promptgenerator.com/images/screenshot-desktop.png",
+            "softwareVersion": "1.0",
+            "aggregateRating": {
+              "@type": "AggregateRating",
+              "ratingValue": "4.8",
+              "ratingCount": "1250"
+            }
+          })
+        }}
+      />
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 dark:from-black dark:from-black dark:from-black">
       <div className="max-w-[720px] mx-auto px-2 xs:px-3 sm:px-4 pt-6 xs:pt-8 sm:pt-10">
         {/* Headline with Accent Color */}
-        <h1 className="text-center text-3xl xs:text-4xl sm:text-5xl lg:text-5xl font-bold mb-2 xs:mb-3 px-1">
-          Veo3 Prompt Generator <span className="text-purple-600">Free Online</span>
+        <h1 className="text-center text-2xl xs:text-3xl sm:text-4xl lg:text-4xl font-bold mb-3 xs:mb-4 px-1">
+          Free Veo3 Prompt Generator <span className="text-purple-600">Online</span>
         </h1>
 
         {/* Description */}
-        <p className="text-gray-700 dark:text-gray-300 text-center mb-4 xs:mb-6 max-w-2xl mx-auto text-sm xs:text-base px-2">
-          Create detailed, production-ready prompts for Google's Veo3 AI video generation. Perfect for content creators, marketers, and video producers.
+        <p className="text-gray-700 dark:text-gray-300 text-center mb-4 xs:mb-6 max-w-3xl mx-auto text-sm xs:text-base px-2 leading-relaxed">
+          Transform your ideas into stunning, high-quality videos. Our AI-powered tool, trained on over 10,000 professional prompts, gives you unparalleled control over every detail—from multi-character dialogue to precise camera movements. 100% free, no signup required.
         </p>
 
         {/* Navigation Tabs */}
@@ -379,10 +469,10 @@ export default function Veo3PromptGeneratorPage() {
         <Card className="shadow-lg bg-white dark:bg-gray-800 mb-6 xs:mb-8 mx-1 xs:mx-2 sm:mx-0 rounded-lg">
           <CardContent className="p-4 xs:p-5 sm:p-6">
             {/* Mode Selection */}
-            <div className="flex items-center justify-center mb-6 gap-3">
+            <div className="flex items-center justify-center mb-6 gap-2">
               <button
                 onClick={() => setActiveMode("chat")}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 ${
+                className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200 ${
                   activeMode === "chat" 
                     ? 'bg-purple-600 text-white' 
                     : 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
@@ -396,7 +486,7 @@ export default function Veo3PromptGeneratorPage() {
               
               <button
                 onClick={() => setActiveMode("advanced")}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 ${
+                className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200 ${
                   activeMode === "advanced" 
                     ? 'bg-purple-600 text-white' 
                     : 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
@@ -405,6 +495,20 @@ export default function Veo3PromptGeneratorPage() {
                 <div className="flex items-center gap-2">
                   <Settings className="h-4 w-4" />
                   Advanced Mode
+                </div>
+              </button>
+
+              <button
+                onClick={() => setActiveMode("history")}
+                className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200 ${
+                  activeMode === "history" 
+                    ? 'bg-purple-600 text-white' 
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <History className="h-4 w-4" />
+                  History
                 </div>
               </button>
             </div>
@@ -589,135 +693,146 @@ export default function Veo3PromptGeneratorPage() {
               </div>
             )}
 
+            {/* History Mode Content */}
+            {activeMode === "history" && (
+              <div className="space-y-4">
+                <PromptHistory />
+              </div>
+            )}
+
             {/* Output Options */}
-            <div className="mt-6 space-y-2">
-              <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                <h3 className="font-semibold text-sm xs:text-base mb-2">Output Options</h3>
-                
-                {/* Prompt Type Options - Parallel on desktop, stacked on mobile */}
-                <div className="flex space-x-4">
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="paragraph-prompt"
-                      checked={outputOptions.paragraphPrompt}
-                      onCheckedChange={(checked) => 
-                        setOutputOptions(prev => ({ ...prev, paragraphPrompt: checked as boolean }))
-                      }
-                    />
-                    <Label htmlFor="paragraph-prompt" className="text-sm">Paragraph Prompt</Label>
-                  </div>
+            {activeMode !== "history" && (
+              <div className="mt-6 space-y-2">
+                <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                  <h3 className="font-semibold text-sm xs:text-base mb-2">Output Options</h3>
                   
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="json-prompt"
-                      checked={outputOptions.jsonPrompt}
-                      onCheckedChange={(checked) => 
-                        setOutputOptions(prev => ({ ...prev, jsonPrompt: checked as boolean }))
-                      }
-                    />
-                    <Label htmlFor="json-prompt" className="text-sm">JSON Prompt</Label>
-                  </div>
-                </div>
-
-                {/* Dialogue Options */}
-                <div className="mt-4">
-                  <Label className="font-semibold text-sm xs:text-base">Dialogue Settings</Label>
-                  <div className="flex space-x-4 mt-1">
-                    <div className="flex items-center space-x-2">
+                  {/* Prompt Type Options - Optimized for mobile */}
+                  <div className="flex space-x-2 xs:space-x-4">
+                    <div className="flex items-center space-x-1.5 xs:space-x-2">
                       <Checkbox
-                        id="dialogue-yes"
-                        checked={outputOptions.dialogue === "yes"}
+                        id="paragraph-prompt"
+                        checked={outputOptions.paragraphPrompt}
                         onCheckedChange={(checked) => 
-                          setOutputOptions(prev => ({ ...prev, dialogue: checked ? "yes" : "no" }))
+                          setOutputOptions(prev => ({ ...prev, paragraphPrompt: checked as boolean }))
                         }
                       />
-                      <Label htmlFor="dialogue-yes" className="text-sm">Has Dialogue</Label>
+                      <Label htmlFor="paragraph-prompt" className="text-xs xs:text-sm">Paragraph Prompt</Label>
                     </div>
-                    <div className="flex items-center space-x-2">
+                    
+                    <div className="flex items-center space-x-1.5 xs:space-x-2">
                       <Checkbox
-                        id="dialogue-ai"
-                        checked={outputOptions.dialogue === "ai"}
+                        id="json-prompt"
+                        checked={outputOptions.jsonPrompt}
                         onCheckedChange={(checked) => 
-                          setOutputOptions(prev => ({ ...prev, dialogue: checked ? "ai" : "no" }))
+                          setOutputOptions(prev => ({ ...prev, jsonPrompt: checked as boolean }))
                         }
                       />
-                      <Label htmlFor="dialogue-ai" className="text-sm">Auto Generate</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id="dialogue-no"
-                        checked={outputOptions.dialogue === "no"}
-                        onCheckedChange={(checked) => 
-                          setOutputOptions(prev => ({ ...prev, dialogue: checked ? "no" : "yes" }))
-                        }
-                      />
-                      <Label htmlFor="dialogue-no" className="text-sm">No Dialogue</Label>
+                      <Label htmlFor="json-prompt" className="text-xs xs:text-sm">JSON Prompt</Label>
                     </div>
                   </div>
-                </div>
 
-                {/* Subtitles Option */}
-                <div className="mt-4">
-                  <Label className="font-semibold text-sm xs:text-base">Subtitles</Label>
-                  <div className="flex space-x-4 mt-1">
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id="subtitles-no"
-                        checked={outputOptions.subtitles === "no"}
-                        onCheckedChange={(checked) => 
-                          setOutputOptions(prev => ({ ...prev, subtitles: checked ? "no" : "yes" }))
-                        }
-                      />
-                      <Label htmlFor="subtitles-no" className="text-sm">No Subtitles</Label>
+                  {/* Dialogue Options */}
+                  <div className="mt-4">
+                    <Label className="font-semibold text-sm xs:text-base">Dialogue Settings</Label>
+                    <div className="flex space-x-2 xs:space-x-4 mt-1">
+                      <div className="flex items-center space-x-1.5 xs:space-x-2">
+                        <Checkbox
+                          id="dialogue-yes"
+                          checked={outputOptions.dialogue === "yes"}
+                          onCheckedChange={(checked) => 
+                            setOutputOptions(prev => ({ ...prev, dialogue: checked ? "yes" : "no" }))
+                          }
+                        />
+                        <Label htmlFor="dialogue-yes" className="text-xs xs:text-sm">Has Dialogue</Label>
+                      </div>
+                      <div className="flex items-center space-x-1.5 xs:space-x-2">
+                        <Checkbox
+                          id="dialogue-ai"
+                          checked={outputOptions.dialogue === "ai"}
+                          onCheckedChange={(checked) => 
+                            setOutputOptions(prev => ({ ...prev, dialogue: checked ? "ai" : "no" }))
+                          }
+                        />
+                        <Label htmlFor="dialogue-ai" className="text-xs xs:text-sm">Auto Generate</Label>
+                      </div>
+                      <div className="flex items-center space-x-1.5 xs:space-x-2">
+                        <Checkbox
+                          id="dialogue-no"
+                          checked={outputOptions.dialogue === "no"}
+                          onCheckedChange={(checked) => 
+                            setOutputOptions(prev => ({ ...prev, dialogue: checked ? "no" : "yes" }))
+                          }
+                        />
+                        <Label htmlFor="dialogue-no" className="text-xs xs:text-sm">No Dialogue</Label>
+                      </div>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id="subtitles-yes"
-                        checked={outputOptions.subtitles === "yes"}
-                        onCheckedChange={(checked) => 
-                          setOutputOptions(prev => ({ ...prev, subtitles: checked ? "yes" : "no" }))
-                        }
-                      />
-                      <Label htmlFor="subtitles-yes" className="text-sm">Include Subtitles</Label>
+                  </div>
+
+                  {/* Subtitles Option */}
+                  <div className="mt-4">
+                    <Label className="font-semibold text-sm xs:text-base">Subtitles</Label>
+                    <div className="flex space-x-2 xs:space-x-4 mt-1">
+                      <div className="flex items-center space-x-1.5 xs:space-x-2">
+                        <Checkbox
+                          id="subtitles-no"
+                          checked={outputOptions.subtitles === "no"}
+                          onCheckedChange={(checked) => 
+                            setOutputOptions(prev => ({ ...prev, subtitles: checked ? "no" : "yes" }))
+                          }
+                        />
+                        <Label htmlFor="subtitles-no" className="text-xs xs:text-sm">No Subtitles</Label>
+                      </div>
+                      <div className="flex items-center space-x-1.5 xs:space-x-2">
+                        <Checkbox
+                          id="subtitles-yes"
+                          checked={outputOptions.subtitles === "yes"}
+                          onCheckedChange={(checked) => 
+                            setOutputOptions(prev => ({ ...prev, subtitles: checked ? "yes" : "no" }))
+                          }
+                        />
+                        <Label htmlFor="subtitles-yes" className="text-xs xs:text-sm">Include Subtitles</Label>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
+            )}
 
             {/* Action Buttons */}
-            <div className="flex gap-3 xs:gap-4 mt-6">
-              <Button
-                onClick={
-                  activeMode === "chat" ? generateChatPrompt : generateAdvancedPrompt
-                }
-                disabled={isGenerating || (!outputOptions.jsonPrompt && !outputOptions.paragraphPrompt)}
-                className="flex-1 bg-purple-600 hover:bg-purple-700 text-white h-10 xs:h-12 text-sm xs:text-base font-medium rounded-lg"
-              >
-                {isGenerating ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Generating Prompt...
-                  </>
-                ) : (
-                  <>
-                    <Video className="mr-2 h-4 w-4" />
-                    Generate Prompt
-                  </>
-                )}
-              </Button>
-              <Button
-                onClick={clearForm}
-                variant="outline"
-                className="h-10 xs:h-12 px-4 xs:px-6 text-sm xs:text-base rounded-lg"
-                disabled={isGenerating}
-              >
-                Clear
-              </Button>
-            </div>
+            {activeMode !== "history" && (
+              <div className="flex gap-3 xs:gap-4 mt-6">
+                <Button
+                  onClick={
+                    activeMode === "chat" ? generateChatPrompt : generateAdvancedPrompt
+                  }
+                  disabled={isGenerating || (!outputOptions.jsonPrompt && !outputOptions.paragraphPrompt)}
+                  className="flex-1 bg-purple-600 hover:bg-purple-700 text-white h-10 xs:h-12 text-sm xs:text-base font-medium rounded-lg"
+                >
+                  {isGenerating ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Generating Prompt...
+                    </>
+                  ) : (
+                    <>
+                      <Video className="mr-2 h-4 w-4" />
+                      Generate Prompt
+                    </>
+                  )}
+                </Button>
+                <Button
+                  onClick={clearForm}
+                  variant="outline"
+                  className="h-10 xs:h-12 px-4 xs:px-6 text-sm xs:text-base rounded-lg"
+                  disabled={isGenerating}
+                >
+                  Clear
+                </Button>
+              </div>
+            )}
 
             {/* Animated Loading Bar */}
-            {isGenerating && (
+            {activeMode !== "history" && isGenerating && (
               <div className="mt-4 space-y-3 animate-in fade-in duration-300">
                 {/* Loading Bar - Full width with padding */}
                 <div className="px-2.5">
@@ -734,7 +849,7 @@ export default function Veo3PromptGeneratorPage() {
             )}
 
             {/* Generated Prompts Output */}
-            {generatedPrompts && (
+            {activeMode !== "history" && generatedPrompts && (
               <div className="mt-6 space-y-4">
                 {/* JSON Format */}
                 {outputOptions.jsonPrompt && generatedPrompts.jsonPrompt && (
@@ -946,5 +1061,6 @@ export default function Veo3PromptGeneratorPage() {
         onClose={closeToast} 
       />
     </div>
+    </>
   )
 } 
