@@ -3,6 +3,55 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Users, MessageSquare, Star, Trophy, Heart, Share2, TrendingUp, Award } from "lucide-react"
 import Image from "next/image"
+import { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "Veo3 Community - Connect with AI Video Creators & Share Prompts",
+  description: "Join the Veo3 community of content creators, AI enthusiasts, and video professionals. Share prompts, get help, and stay updated with the latest AI video generation trends.",
+  keywords: "Veo3 community, AI video creators, content creator community, prompt sharing, video creation tips, AI video enthusiasts, content creator network, video production community, AI tools community, digital creators, video marketing community, creative collaboration",
+  authors: [{ name: "Veo3 Prompt Generator Team" }],
+  creator: "Veo3 Prompt Generator",
+  publisher: "Veo3 Prompt Generator",
+  metadataBase: new URL("https://veo3promptgenerator.online"),
+  alternates: {
+    canonical: "/community",
+  },
+  openGraph: {
+    title: "Veo3 Community - Connect with AI Video Creators & Share Prompts",
+    description: "Join the Veo3 community of content creators, AI enthusiasts, and video professionals. Share prompts, get help, and stay updated with the latest AI video generation trends.",
+    url: "https://veo3promptgenerator.online/community",
+    siteName: "Veo3 Prompt Generator",
+    images: [
+      {
+        url: "/images/og-image-1200x630.png",
+        width: 1200,
+        height: 630,
+        alt: "Veo3 Community - AI Video Creators Network",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Veo3 Community - Connect with AI Video Creators & Share Prompts",
+    description: "Join the Veo3 community of content creators, AI enthusiasts, and video professionals. Share prompts, get help, and stay updated with the latest AI video generation trends.",
+    images: ["/images/og-image-1200x630.png"],
+    creator: "@veo3promptgen",
+    site: "@veo3promptgen",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+}
 
 const communityStats = [
   { icon: Users, label: "Active Members", value: "25K+" },

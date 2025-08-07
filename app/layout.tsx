@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL("https://veo3promptgenerator.com"),
+  metadataBase: new URL("https://veo3promptgenerator.online"),
   alternates: {
     canonical: "/",
   },
@@ -49,7 +49,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://veo3promptgenerator.com",
+          url: "https://veo3promptgenerator.online",
     siteName: "Veo3 Prompt Generator",
     title: "Veo3 Prompt Generator - Free AI Video Prompt Creator | Professional Content Tools",
     description: "Create professional Veo3 prompts and video scripts with our free AI-powered generator. Perfect for content creators, marketers, and businesses. Transform ideas into high-quality video content instantly.",
@@ -123,7 +123,7 @@ export default function RootLayout({
         <meta name="theme-color" content="#6366f1" />
         <meta name="msapplication-TileColor" content="#6366f1" />
         <meta name="msapplication-config" content="/browserconfig.xml" />
-        <link rel="canonical" href="https://veo3promptgenerator.com" />
+        <link rel="canonical" href="https://veo3promptgenerator.online" />
         <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
         <meta name="googlebot" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
       </head>

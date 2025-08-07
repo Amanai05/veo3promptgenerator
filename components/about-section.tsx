@@ -13,7 +13,7 @@ interface AboutSectionProps {
 export function AboutSection({ locale }: AboutSectionProps) {
   const [isExpanded, setIsExpanded] = useState(false)
 
-  const fullContent = `VeO3 Prompt Generator represents the cutting-edge evolution of AI-powered creative tools, specifically designed to revolutionize how content creators, marketers, and businesses approach video production and prompt engineering. Our platform harnesses the advanced capabilities of Gemini 2.5 Pro technology to deliver unprecedented accuracy and creativity in video prompt generation.
+  const fullContent = `Veo3 Prompt Generator represents the cutting-edge evolution of AI-powered creative tools, specifically designed to revolutionize how content creators, marketers, and businesses approach video production and prompt engineering. Our platform harnesses the advanced capabilities of Gemini 2.5 Pro technology to deliver unprecedented accuracy and creativity in video prompt generation.
 
 At the core of our innovation lies a sophisticated understanding of visual storytelling, technical video production requirements, and the nuanced art of prompt crafting. We recognize that creating compelling video content requires more than just basic descriptions – it demands a deep comprehension of cinematography, narrative structure, audience psychology, and technical execution.
 
@@ -31,7 +31,7 @@ Security and privacy remain paramount in our design philosophy. All user interac
 
 The community showcase feature highlights the remarkable diversity and quality of content created using our tools, serving as both inspiration and validation of our platform's capabilities. These real-world examples demonstrate the practical applications of AI-assisted creativity across industries, from independent content creators to major brand campaigns.
 
-Looking forward, VeO3 Prompt Generator continues to evolve, incorporating user feedback, advancing AI capabilities, and expanding creative possibilities. Our roadmap includes enhanced collaboration features, advanced analytics for content optimization, integration with major video production platforms, and continued expansion of language support to serve the global creative community.
+Looking forward, Veo3 Prompt Generator continues to evolve, incorporating user feedback, advancing AI capabilities, and expanding creative possibilities. Our roadmap includes enhanced collaboration features, advanced analytics for content optimization, integration with major video production platforms, and continued expansion of language support to serve the global creative community.
 
 We believe that the future of content creation lies in the harmonious collaboration between human creativity and artificial intelligence. Our platform doesn't replace human creativity – it amplifies it, providing the tools, guidance, and technical capabilities that allow creators to focus on what they do best: telling compelling stories and creating meaningful connections with their audiences.`
 
@@ -45,7 +45,7 @@ We believe that the future of content creation lies in the harmonious collaborat
             <h2 className="text-2xl sm:text-3xl font-bold mb-3">
               About{" "}
               <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                VeO3 Prompt Generator
+                Veo3 Prompt Generator
               </span>
             </h2>
             <p className="text-sm text-muted-foreground">

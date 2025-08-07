@@ -14,14 +14,14 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL("https://veo3promptgenerator.com"),
+  metadataBase: new URL("https://veo3promptgenerator.online"),
   alternates: {
     canonical: "/",
   },
   openGraph: {
     title: "Veo3 Prompt Generator - Free AI Video Prompt Creator | Professional Content Tools",
     description: "Create professional Veo3 prompts and video scripts with our free AI-powered generator. Perfect for content creators, marketers, and businesses. Transform ideas into high-quality video content instantly.",
-    url: "https://veo3promptgenerator.com",
+          url: "https://veo3promptgenerator.online",
     siteName: "Veo3 Prompt Generator",
     images: [
       {
@@ -88,8 +88,8 @@ export default function HomePage() {
             "@context": "https://schema.org",
             "@type": "Organization",
             "name": "Veo3 Prompt Generator",
-            "url": "https://veo3promptgenerator.com",
-            "logo": "https://veo3promptgenerator.com/images/og-image-1200x630.png",
+                    "url": "https://veo3promptgenerator.online",
+        "logo": "https://veo3promptgenerator.online/images/og-image-1200x630.png",
             "description": "Free AI-powered Veo3 prompt generator for content creators, marketers, and businesses",
             "sameAs": [
               "https://twitter.com/veo3promptgen",
@@ -100,7 +100,7 @@ export default function HomePage() {
             "contactPoint": {
               "@type": "ContactPoint",
               "contactType": "customer service",
-              "email": "support@veo3promptgenerator.com",
+              "email": "veo3promptgenerator.online@gmail.com",
               "availableLanguage": "English"
             },
             "address": {
@@ -121,11 +121,11 @@ export default function HomePage() {
             "@context": "https://schema.org",
             "@type": "WebSite",
             "name": "Veo3 Prompt Generator",
-            "url": "https://veo3promptgenerator.com",
-            "description": "Free AI-powered Veo3 prompt generator and video script creator",
-            "potentialAction": {
-              "@type": "SearchAction",
-              "target": "https://veo3promptgenerator.com/search?q={search_term_string}",
+                    "url": "https://veo3promptgenerator.online",
+        "description": "Free AI-powered Veo3 prompt generator and video script creator",
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://veo3promptgenerator.online/search?q={search_term_string}",
               "query-input": "required name=search_term_string"
             },
             "inLanguage": "en-US",
@@ -145,28 +145,28 @@ export default function HomePage() {
             "applicationCategory": "ContentCreationApplication",
             "operatingSystem": "Web Browser",
             "description": "AI-powered tool for creating professional Veo3 prompts and video scripts",
-            "url": "https://veo3promptgenerator.com",
-            "offers": {
-              "@type": "Offer",
-              "price": "0",
-              "priceCurrency": "USD",
-              "availability": "https://schema.org/InStock"
-            },
-            "featureList": [
-              "Veo3 Prompt Generation",
-              "Video Script Creation", 
-              "AI-Powered Content Tools",
-              "Professional Templates",
-              "Free Online Access",
-              "Multi-Language Support",
-              "Advanced Customization",
-              "Real-time Generation"
-            ],
-            "screenshot": "https://veo3promptgenerator.com/images/og-image-1200x630.png",
-            "softwareVersion": "1.0.0",
-            "releaseNotes": "Latest version with enhanced AI capabilities and multi-API support",
-            "downloadUrl": "https://veo3promptgenerator.com",
-            "installUrl": "https://veo3promptgenerator.com",
+                    "url": "https://veo3promptgenerator.online",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD",
+          "availability": "https://schema.org/InStock"
+        },
+        "featureList": [
+          "Veo3 Prompt Generation",
+          "Video Script Creation",
+          "AI-Powered Content Tools",
+          "Professional Templates",
+          "Free Online Access",
+          "Multi-Language Support",
+          "Advanced Customization",
+          "Real-time Generation"
+        ],
+        "screenshot": "https://veo3promptgenerator.online/images/og-image-1200x630.png",
+        "softwareVersion": "1.0.0",
+        "releaseNotes": "Latest version with enhanced AI capabilities and multi-API support",
+        "downloadUrl": "https://veo3promptgenerator.online",
+        "installUrl": "https://veo3promptgenerator.online",
             "aggregateRating": {
               "@type": "AggregateRating",
               "ratingValue": "4.8",
@@ -194,7 +194,7 @@ export default function HomePage() {
                 "@type": "ListItem",
                 "position": 1,
                 "name": "Home",
-                "item": "https://veo3promptgenerator.com"
+                "item": "https://veo3promptgenerator.online"
               }
             ]
           })

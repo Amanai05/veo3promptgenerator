@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Free Veo3 Prompt Generator (Advanced JSON & Viral Templates)",
     description: "Generate production-ready prompts for Google's Veo3. Our free tool creates advanced JSON & paragraph prompts with viral templates and full cinematic control. No signup required.",
-    url: "https://veo3promptgenerator.com/veo3-prompt-generator",
+          url: "https://veo3promptgenerator.online/veo3-prompt-generator",
     siteName: "Veo3 Prompt Generator",
     images: [
       {
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     images: ["/images/twitter-image-1200x600.png"],
   },
   alternates: {
-    canonical: "https://veo3promptgenerator.com/veo3-prompt-generator",
+          canonical: "https://veo3promptgenerator.online/veo3-prompt-generator",
   },
   robots: {
     index: true,

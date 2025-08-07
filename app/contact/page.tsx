@@ -57,7 +57,7 @@ export default function ContactPage() {
           </h1>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
             Have questions, feedback, or need support? We'd love to hear from you. Our team is here to help you make the
-            most of VeO3 Prompt Generator and achieve your creative goals.
+            most of Veo3 Prompt Generator and achieve your creative goals.
           </p>
         </div>
       </section>
@@ -164,7 +164,7 @@ export default function ContactPage() {
                   </CardHeader>
                   <CardContent>
                     <p className="text-muted-foreground mb-2">For general inquiries and support</p>
-                    <p className="font-medium">support@veo3promgenerator.com</p>
+                    <p className="font-medium">veo3promptgenerator.online@gmail.com</p>
                     <p className="text-sm text-muted-foreground mt-2">We typically respond within 24 hours</p>
                   </CardContent>
                 </Card>
@@ -251,7 +251,7 @@ export default function ContactPage() {
             <div className="mt-16 text-center">
               <h2 className="text-2xl font-bold mb-4">Frequently Asked Questions</h2>
               <p className="text-muted-foreground mb-8">
-                Check out our FAQ section for quick answers to common questions about VeO3 Prompt Generator.
+                Check out our FAQ section for quick answers to common questions about Veo3 Prompt Generator.
               </p>
               <div className="flex justify-center gap-4">
                 <Button variant="outline" asChild>

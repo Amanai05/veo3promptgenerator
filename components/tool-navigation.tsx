@@ -29,8 +29,8 @@ export function ToolNavigation({ activeTool }: ToolNavigationProps) {
     },
     {
       id: "transcription",
-      name: "Video Transcription",
-      href: "/transcription", 
+      name: "Video to Text",
+      href: "/video-to-text", 
       color: "orange"
     }
   ]

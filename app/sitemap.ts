@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next"
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = "https://veo3promptgenerator.com"
+  const baseUrl = "https://veo3promptgenerator.online"
   const currentDate = new Date()
 
   return [
@@ -27,6 +27,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     {
       url: `${baseUrl}/video-to-prompt`,
+      lastModified: currentDate,
+      changeFrequency: "daily",
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/video-to-text`,
       lastModified: currentDate,
       changeFrequency: "daily",
       priority: 0.9,
@@ -75,6 +81,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: currentDate,
       changeFrequency: "monthly",
       priority: 0.5,
+    },
+    // Sitemap Page
+    {
+      url: `${baseUrl}/sitemap`,
+      lastModified: currentDate,
+      changeFrequency: "monthly",
+      priority: 0.4,
     },
     // Legal Pages - Lowest Priority
     {

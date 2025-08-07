@@ -4,7 +4,7 @@ const https = require('https');
 const http = require('http');
 
 const BASE_URL = 'http://localhost:3000';
-const PRODUCTION_URL = 'https://veo3promptgenerator.com';
+const PRODUCTION_URL = 'https://veo3promptgenerator.online';
 
 console.log('🔍 SEO Configuration Validation');
 console.log('================================\n');
@@ -22,7 +22,7 @@ async function testSitemap() {
       console.log('   ❌ Invalid XML format');
     }
     
-    if (sitemap.includes('https://veo3promptgenerator.com')) {
+    if (sitemap.includes('https://veo3promptgenerator.online')) {
       console.log('   ✅ Correct domain in URLs');
     } else {
       console.log('   ❌ Incorrect domain in URLs');

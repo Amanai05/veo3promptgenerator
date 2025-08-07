@@ -4,26 +4,27 @@ import { useState, useCallback } from "react"
 import { useDropzone } from "react-dropzone"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useToast } from "@/hooks/use-toast"
-import { Copy, Upload, Video, Loader2, Brain, X, FileVideo } from "lucide-react"
+import { Copy, Upload, Video, Loader2, Brain, X, FileVideo, Eye, Play } from "lucide-react"
 import { ToolNavigation } from "@/components/tool-navigation"
+import { DetailedAnalysisView } from "@/components/video-analysis-detailed-view"
+import { Veo3PromptsView } from "@/components/veo3-prompts-view"
+import { DetailedVideoAnalysis, Veo3PromptResult } from "@/lib/services/dual-ai-pipeline"
 
 // File validation constants
 const MAX_FILE_SIZE = 100 * 1024 * 1024 // 100MB
 const MAX_DURATION_SECONDS = 120 // 2 minutes
 
-interface VideoAnalysisResult {
-  analysis: string
-  metadata: {
-    model: string
-    processingTime: number
-  }
-}
+
 
 export default function VideoToPromptPage() {
   const [videoFile, setVideoFile] = useState<File | null>(null)
   const [isProcessing, setIsProcessing] = useState(false)
-  const [analysisResult, setAnalysisResult] = useState<VideoAnalysisResult | null>(null)
+  const [currentStage, setCurrentStage] = useState<'upload' | 'analyzing' | 'converting' | 'complete'>('upload')
+  const [detailedAnalysis, setDetailedAnalysis] = useState<DetailedVideoAnalysis | null>(null)
+  const [veo3Prompts, setVeo3Prompts] = useState<Veo3PromptResult | null>(null)
+  const [totalProcessingTime, setTotalProcessingTime] = useState<number>(0)
   const { toast } = useToast()
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
@@ -51,7 +52,10 @@ export default function VideoToPromptPage() {
       }
 
       setVideoFile(file)
-      setAnalysisResult(null)
+      setDetailedAnalysis(null)
+      setVeo3Prompts(null)
+      setTotalProcessingTime(0)
+      setCurrentStage('upload')
       toast({
         title: "Video uploaded successfully!",
         description: `${file.name} has been uploaded.`,
@@ -70,7 +74,10 @@ export default function VideoToPromptPage() {
 
   const removeVideo = () => {
     setVideoFile(null)
-    setAnalysisResult(null)
+    setDetailedAnalysis(null)
+    setVeo3Prompts(null)
+    setTotalProcessingTime(0)
+    setCurrentStage('upload')
   }
 
   const validateForm = () => {
@@ -90,58 +97,69 @@ export default function VideoToPromptPage() {
     if (!validateForm()) return
 
     setIsProcessing(true)
-    setAnalysisResult(null)
+    setCurrentStage('analyzing')
+    setDetailedAnalysis(null)
+    setVeo3Prompts(null)
+    setTotalProcessingTime(0)
 
     try {
-      // Mock processing for now - backend will be implemented separately
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      
-      // Mock result
-      const mockResult = {
-        analysis: "This is a sample video analysis. The backend will be implemented separately to provide real AI-powered video analysis.",
-        metadata: {
-          model: "Backend will be implemented",
-          processingTime: 2000
-        }
+      // Create FormData for file upload
+      const formData = new FormData()
+      formData.append('video', videoFile!)
+
+      console.log("🚀 Starting Dual AI Pipeline...")
+      console.log("📹 File info:", { 
+        name: videoFile!.name, 
+        size: videoFile!.size, 
+        type: videoFile!.type 
+      })
+
+      const response = await fetch('/api/video-to-veo3', {
+        method: 'POST',
+        body: formData,
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to process video')
       }
 
-      setAnalysisResult(mockResult)
+      if (!data.success) {
+        throw new Error(data.error || 'Processing failed')
+      }
+
+      // Update state with results
+      setDetailedAnalysis(data.detailedAnalysis)
+      setVeo3Prompts(data.veo3Prompts)
+      setTotalProcessingTime(data.totalProcessingTime)
+      setCurrentStage('complete')
 
       toast({
-        title: "Video analysis completed!",
-        description: "Backend will be implemented separately.",
+        title: "Dual AI Pipeline completed!",
+        description: `Generated ${data.veo3Prompts.scenes.length} Veo3 prompts in ${(data.totalProcessingTime / 1000).toFixed(1)}s`,
       })
     } catch (error) {
-      console.error("Analysis error:", error)
+      console.error("❌ Dual AI Pipeline error:", error)
       toast({
-        title: "Analysis failed",
-        description: "Backend will be implemented separately.",
+        title: "Processing failed",
+        description: error instanceof Error ? error.message : "Failed to process video. Please try again.",
         variant: "destructive"
       })
+      setCurrentStage('upload')
     } finally {
       setIsProcessing(false)
     }
   }
 
-  const copyToClipboard = async (text: string) => {
-    try {
-      await navigator.clipboard.writeText(text)
-      toast({
-        title: "Copied to clipboard",
-        description: "The analysis has been copied to your clipboard.",
-      })
-    } catch (error) {
-      toast({
-        title: "Copy failed",
-        description: "Failed to copy to clipboard. Please copy manually.",
-        variant: "destructive"
-      })
-    }
-  }
+
 
   const clearAll = () => {
     setVideoFile(null)
-    setAnalysisResult(null)
+    setDetailedAnalysis(null)
+    setVeo3Prompts(null)
+    setTotalProcessingTime(0)
+    setCurrentStage('upload')
   }
 
   const formatFileSize = (bytes: number) => {
@@ -159,15 +177,15 @@ export default function VideoToPromptPage() {
     },
     {
       question: "How does the AI analyze my video?",
-      answer: "Our advanced AI analyzes your video by examining scenes, objects, actions, colors, lighting, and audio elements to create comprehensive analysis that captures the essence of your content."
+      answer: "Our Gemini 2.5 Flash AI analyzes your video scene-by-scene with professional cinematography analysis, detailed lighting descriptions, comprehensive audio breakdowns, and precise technical specifications for Veo video generation."
     },
     {
       question: "What type of analysis will I get?",
-      answer: "You'll receive detailed video analysis including scene breakdown, visual elements, camera techniques, lighting analysis, audio elements, and technical specifications."
+      answer: "You'll receive professional scene-by-scene breakdowns with detailed cinematography, lighting analysis, audio descriptions, dialogue transcription, and ready-to-use Veo generation prompts for each 8-second segment."
     },
     {
       question: "How accurate is the video analysis?",
-      answer: "Our AI achieves high accuracy in video analysis, with advanced computer vision and machine learning algorithms that understand context, emotions, and visual elements."
+      answer: "Gemini 2.5 Flash achieves high accuracy in video analysis, with advanced computer vision and machine learning algorithms that understand professional cinematic language and technical specifications."
     },
     {
       question: "Can I use the generated analysis for commercial projects?",
@@ -175,7 +193,7 @@ export default function VideoToPromptPage() {
     },
     {
       question: "How long does video analysis take?",
-      answer: "Analysis typically takes 30-60 seconds depending on video length and complexity. Our optimized AI ensures fast and reliable results."
+      answer: "Analysis typically takes 15-30 seconds depending on video length and complexity. Our optimized Gemini 2.5 Flash ensures fast and reliable results with professional-grade output."
     }
   ]
 
@@ -189,7 +207,7 @@ export default function VideoToPromptPage() {
 
         {/* Description */}
         <p className="text-gray-700 dark:text-gray-300 text-center mb-4 xs:mb-6 max-w-2xl mx-auto text-sm xs:text-base px-2">
-          Transform your existing videos into detailed AI prompts. Upload a video and get comprehensive analysis for AI video generation platforms.
+          Transform your existing videos using our Dual AI Pipeline. Stage 1: Pixel-perfect video analysis. Stage 2: Professional Veo3 prompt generation. Get detailed analysis and ready-to-use prompts.
         </p>
 
         {/* Navigation Tabs */}
@@ -266,7 +284,7 @@ export default function VideoToPromptPage() {
                 onClick={clearAll}
                 variant="outline"
                 className="h-10 xs:h-12 px-4 xs:px-6 text-sm xs:text-base rounded-lg"
-                disabled={isProcessing || (!videoFile && !analysisResult)}
+                disabled={isProcessing || (!videoFile && !detailedAnalysis)}
               >
                 Clear
               </Button>
@@ -280,38 +298,40 @@ export default function VideoToPromptPage() {
                 </div>
                 <div className="text-center">
                   <p className="text-sm text-green-600 dark:text-green-400 font-medium animate-pulse">
-                    Analyzing video content with AI...
+                    {currentStage === 'analyzing' && "Stage 1: Analyzing video with pixel-level precision..."}
+                    {currentStage === 'converting' && "Stage 2: Converting analysis to Veo3 prompts..."}
                   </p>
                 </div>
               </div>
             )}
 
             {/* Results Container */}
-            {analysisResult && (
+            {currentStage === 'complete' && detailedAnalysis && veo3Prompts && (
               <div className="mt-4 xs:mt-6 space-y-4">
-                <div className="p-4 xs:p-5 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                  <div className="flex justify-between items-center mb-3">
-                    <h4 className="font-bold text-sm xs:text-base">Video Analysis:</h4>
-                    <Button
-                      onClick={() => copyToClipboard(analysisResult.analysis)}
-                      variant="outline"
-                      size="sm"
-                      className="flex items-center gap-2"
-                    >
-                      <Copy className="h-4 w-4" />
-                      Copy
-                    </Button>
-                  </div>
-                  <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border">
-                    <div className="whitespace-pre-wrap text-sm xs:text-base text-gray-800 dark:text-gray-200 leading-relaxed">
-                      {analysisResult.analysis}
-                    </div>
-                  </div>
-                </div>
+                <Tabs defaultValue="analysis" className="w-full">
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="analysis" className="flex items-center gap-2">
+                      <Eye className="h-4 w-4" />
+                      Detailed Analysis
+                    </TabsTrigger>
+                    <TabsTrigger value="prompts" className="flex items-center gap-2">
+                      <Play className="h-4 w-4" />
+                      Veo3 Prompts
+                    </TabsTrigger>
+                  </TabsList>
+                  
+                  <TabsContent value="analysis" className="mt-4">
+                    <DetailedAnalysisView analysis={detailedAnalysis} />
+                  </TabsContent>
+                  
+                  <TabsContent value="prompts" className="mt-4">
+                    <Veo3PromptsView prompts={veo3Prompts} />
+                  </TabsContent>
+                </Tabs>
 
                 {/* Processing Metadata */}
                 <div className="text-xs text-gray-500 dark:text-gray-400 text-center">
-                  Processed with {analysisResult.metadata.model} in {analysisResult.metadata.processingTime}ms
+                  Dual AI Pipeline completed in {totalProcessingTime}ms
                 </div>
               </div>
             )}
@@ -342,8 +362,8 @@ export default function VideoToPromptPage() {
                   <span className="text-green-600 font-bold text-sm">2</span>
                 </div>
                 <div>
-                  <h4 className="font-semibold text-sm xs:text-base mb-1">AI Analysis</h4>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Our advanced AI will extract key visual elements, scenes, objects, and actions from your video.</p>
+                  <h4 className="font-semibold text-sm xs:text-base mb-1">Professional Scene Analysis</h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Our Gemini 2.5 Flash AI will analyze your video scene-by-scene with professional cinematography terms and detailed audio analysis.</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
@@ -351,8 +371,8 @@ export default function VideoToPromptPage() {
                   <span className="text-green-600 font-bold text-sm">3</span>
                 </div>
                 <div>
-                  <h4 className="font-semibold text-sm xs:text-base mb-1">Get Detailed Analysis</h4>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Receive comprehensive video analysis including scene breakdown, visual elements, camera techniques, lighting, and technical specifications.</p>
+                  <h4 className="font-semibold text-sm xs:text-base mb-1">Get Veo-Ready Prompts</h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Receive professional scene breakdowns with detailed cinematography, lighting, audio analysis, and ready-to-use Veo generation prompts.</p>
                 </div>
               </div>
             </div>
@@ -364,7 +384,7 @@ export default function VideoToPromptPage() {
           <CardContent className="p-4 xs:p-5">
             <h3 className="text-lg xs:text-xl font-bold mb-3 xs:mb-4 text-green-600">About Video to Prompt Generator</h3>
             <p className="text-sm xs:text-base text-gray-700 dark:text-gray-300 leading-relaxed">
-              Our Video to Prompt Generator is an innovative AI-powered tool that transforms your existing videos into detailed analysis for AI video generation platforms. By analyzing your video content, our advanced AI extracts key visual elements, scenes, objects, and actions to create comprehensive analysis that can be used to generate similar or enhanced video content. This tool is perfect for content creators, marketers, and video producers who want to leverage their existing content to create new AI-generated videos with consistent style and messaging.
+              Our Video to Prompt Generator is an innovative AI-powered tool that transforms your existing videos into professional scene-by-scene analysis using Gemini 2.5 Flash. Our advanced AI deconstructs your video into 8-second segments with detailed cinematography analysis, professional lighting descriptions, comprehensive audio breakdowns, and ready-to-use Veo generation prompts. This tool is perfect for content creators, filmmakers, and video producers who want to leverage their existing content to create new AI-generated videos with professional cinematic quality and precise technical specifications.
             </p>
           </CardContent>
         </Card>

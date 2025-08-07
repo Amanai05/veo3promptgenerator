@@ -1,3 +1,53 @@
+import { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "Disclaimer - Veo3 Prompt Generator | Legal Disclaimers & Terms",
+  description: "Read our disclaimer for Veo3 Prompt Generator. Important legal information about AI-generated content, user responsibilities, and service limitations.",
+  keywords: "disclaimer, legal disclaimer, Veo3 Prompt Generator disclaimer, AI content disclaimer, user responsibility, legal terms, service limitations, AI-generated content disclaimer, legal information, user agreement disclaimer",
+  authors: [{ name: "Veo3 Prompt Generator Team" }],
+  creator: "Veo3 Prompt Generator",
+  publisher: "Veo3 Prompt Generator",
+  metadataBase: new URL("https://veo3promptgenerator.online"),
+  alternates: {
+    canonical: "/disclaimer",
+  },
+  openGraph: {
+    title: "Disclaimer - Veo3 Prompt Generator | Legal Disclaimers & Terms",
+    description: "Read our disclaimer for Veo3 Prompt Generator. Important legal information about AI-generated content, user responsibilities, and service limitations.",
+    url: "https://veo3promptgenerator.online/disclaimer",
+    siteName: "Veo3 Prompt Generator",
+    images: [
+      {
+        url: "/images/og-image-1200x630.png",
+        width: 1200,
+        height: 630,
+        alt: "Disclaimer - Veo3 Prompt Generator",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Disclaimer - Veo3 Prompt Generator | Legal Disclaimers & Terms",
+    description: "Read our disclaimer for Veo3 Prompt Generator. Important legal information about AI-generated content, user responsibilities, and service limitations.",
+    images: ["/images/og-image-1200x630.png"],
+    creator: "@veo3promptgen",
+    site: "@veo3promptgen",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+}
+
 export default function DisclaimerPage() {
   return (
     <main>
@@ -18,7 +68,7 @@ export default function DisclaimerPage() {
                 <h2 className="text-2xl font-bold mb-4">General Information</h2>
                 <p className="text-muted-foreground leading-relaxed">
                   The information on this website is provided on an "as is" basis. To the fullest extent permitted by
-                  law, VeO3 Prompt Generator excludes all representations, warranties, obligations, and liabilities
+                  law, Veo3 Prompt Generator excludes all representations, warranties, obligations, and liabilities
                   arising out of or in connection with this website and its contents or which is or may be provided by
                   any affiliates or any other third party, including in relation to any inaccuracies or omissions in
                   this website and/or the company's literature.
@@ -58,7 +108,7 @@ export default function DisclaimerPage() {
               <section>
                 <h2 className="text-2xl font-bold mb-4">Limitation of Liability</h2>
                 <p className="text-muted-foreground leading-relaxed">
-                  To the maximum extent permitted by applicable law, VeO3 Prompt Generator shall not be liable for any
+                  To the maximum extent permitted by applicable law, Veo3 Prompt Generator shall not be liable for any
                   indirect, incidental, special, consequential, or punitive damages, or any loss of profits or revenues,
                   whether incurred directly or indirectly, or any loss of data, use, goodwill, or other intangible
                   losses, resulting from your use of our service, including but not limited to damages arising from the
@@ -89,7 +139,7 @@ export default function DisclaimerPage() {
               <section>
                 <h2 className="text-2xl font-bold mb-4">Professional Advice</h2>
                 <p className="text-muted-foreground leading-relaxed">
-                  The information and tools provided by VeO3 Prompt Generator are for general informational purposes
+                  The information and tools provided by Veo3 Prompt Generator are for general informational purposes
                   only and should not be considered as professional advice. Users should consult with qualified
                   professionals for specific advice related to their particular circumstances, especially for commercial
                   or professional video production projects.
@@ -131,7 +181,7 @@ export default function DisclaimerPage() {
                   If you have any questions about this disclaimer, please contact us at:
                 </p>
                 <div className="bg-muted rounded-lg p-4">
-                  <p className="font-medium">Email: legal@veo3promgenerator.com</p>
+                                      <p className="font-medium">Email: veo3promptgenerator.online@gmail.com</p>
                   <p className="font-medium">Address: 123 Innovation Drive, San Francisco, CA 94105</p>
                   <p className="font-medium">Phone: +1 (555) 123-4567</p>
                 </div>

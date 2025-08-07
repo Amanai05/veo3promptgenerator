@@ -21,16 +21,16 @@ export default function TranscriptionPage() {
   const onDrop = useCallback((acceptedFiles: File[]) => {
     if (acceptedFiles.length > 0) {
       const file = acceptedFiles[0]
-      if (file.type.startsWith('video/')) {
+      if (file.type.startsWith('video/') || file.type.startsWith('audio/')) {
         setUploadedVideo(file)
         toast({
-          title: "Video uploaded successfully!",
+          title: "File uploaded successfully!",
           description: `${file.name} has been uploaded.`,
         })
       } else {
         toast({
           title: "Invalid file type",
-          description: "Please upload a video file.",
+          description: "Please upload a video or audio file.",
           variant: "destructive",
         })
       }
@@ -40,7 +40,8 @@ export default function TranscriptionPage() {
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: {
-      'video/*': ['.mp4', '.avi', '.mov', '.wmv', '.flv', '.webm']
+      'video/*': ['.mp4', '.avi', '.mov', '.wmv', '.flv', '.webm'],
+      'audio/*': ['.mp3', '.wav', '.m4a', '.aac', '.ogg', '.flac']
     },
     maxFiles: 1,
     maxSize: 100 * 1024 * 1024 // 100MB
@@ -54,8 +55,8 @@ export default function TranscriptionPage() {
   const transcribeVideo = async () => {
     if (!uploadedVideo) {
       toast({
-        title: "No video uploaded",
-        description: "Please upload a video file first.",
+        title: "No file uploaded",
+        description: "Please upload a video or audio file first.",
         variant: "destructive",
       })
       return
@@ -65,7 +66,7 @@ export default function TranscriptionPage() {
     setTranscription("")
 
     try {
-      console.log("🎵 Starting Video to Text conversion...")
+      console.log("🎵 Starting Audio/Video to Text conversion...")
       
       const formData = new FormData()
       formData.append('video', uploadedVideo)
@@ -76,18 +77,18 @@ export default function TranscriptionPage() {
       })
 
       const data = await response.json()
-      if (!response.ok) throw new Error(data.error || "Failed to convert video to text")
+      if (!response.ok) throw new Error(data.error || "Failed to convert file to text")
 
       setTranscription(data.transcription)
       toast({
-        title: "Video to Text conversion completed!",
+        title: "Audio/Video to Text conversion completed!",
         description: `Transcription completed in ${(data.metadata.processingTime / 1000).toFixed(1)}s using ${data.metadata.model}`,
       })
     } catch (error) {
-      console.error("❌ Error converting video to text:", error)
+      console.error("❌ Error converting file to text:", error)
       toast({
         title: "Conversion failed",
-        description: error instanceof Error ? error.message : "Failed to convert video to text. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to convert file to text. Please try again.",
         variant: "destructive",
       })
     } finally {
@@ -174,7 +175,7 @@ export default function TranscriptionPage() {
 
         {/* Description */}
         <p className="text-gray-700 dark:text-gray-300 text-center mb-4 xs:mb-6 max-w-2xl mx-auto text-sm xs:text-base px-2">
-          Convert video audio to text with Gemini 2.5 Flash AI. Extract and transcribe all audio content with professional accuracy and language detection.
+          Convert video and audio files to text with Gemini 2.5 Flash AI. Extract and transcribe all audio content with professional accuracy and language detection.
         </p>
 
         {/* Navigation Tabs */}
@@ -185,7 +186,7 @@ export default function TranscriptionPage() {
           <CardContent className="p-4 xs:p-5 sm:p-6">
             {/* Video Upload Section */}
             <div className="mb-4 xs:mb-6">
-              <label className="text-sm xs:text-base font-bold mb-2 block">Upload Video:</label>
+              <label className="text-sm xs:text-base font-bold mb-2 block">Upload File:</label>
               <div
                 {...getRootProps()}
                 className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${
@@ -197,18 +198,22 @@ export default function TranscriptionPage() {
                 <input {...getInputProps()} />
                 <Upload className="mx-auto h-8 w-8 text-gray-400 mb-2" />
                 <p className="text-sm xs:text-base text-gray-600 dark:text-gray-400">
-                  {isDragActive ? "Drop the video here..." : "Drag & drop a video file here, or click to select"}
+                  {isDragActive ? "Drop the file here..." : "Drag & drop a video or audio file here, or click to select"}
                 </p>
-                <p className="text-xs text-gray-500 mt-1">Supports MP4, MOV, AVI (Max 100MB)</p>
+                <p className="text-xs text-gray-500 mt-1">Supports MP4, MOV, AVI, MP3, WAV (Max 100MB)</p>
               </div>
             </div>
 
-            {/* Uploaded Video Display */}
+            {/* Uploaded File Display */}
             {uploadedVideo && (
               <div className="mb-4 xs:mb-6 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
-                    <Video className="h-4 w-4 text-orange-600" />
+                    {uploadedVideo.type.startsWith('video/') ? (
+                      <Video className="h-4 w-4 text-orange-600" />
+                    ) : (
+                      <Mic className="h-4 w-4 text-orange-600" />
+                    )}
                     <span className="text-sm xs:text-base font-medium">{uploadedVideo.name}</span>
                   </div>
                   <Button
@@ -290,12 +295,12 @@ export default function TranscriptionPage() {
           </CardContent>
         </Card>
 
-        {/* How Video to Text Works */}
+        {/* How Audio/Video to Text Works */}
         <Card className="shadow-lg bg-white dark:bg-gray-800 mb-6 xs:mb-8 mx-1 xs:mx-2 sm:mx-0 rounded-lg">
           <CardHeader>
             <CardTitle className="text-lg xs:text-xl sm:text-2xl font-bold text-orange-600 flex items-center gap-2">
               <Brain className="h-5 w-5" />
-              How Video to Text Works
+              How Audio/Video to Text Works
             </CardTitle>
           </CardHeader>
           <CardContent className="p-4 xs:p-5">
@@ -305,8 +310,8 @@ export default function TranscriptionPage() {
                   <span className="text-orange-600 font-bold text-sm">1</span>
                 </div>
                 <div>
-                  <h4 className="font-semibold text-sm xs:text-base mb-1">Upload Your Video</h4>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Upload any video file (MP4, MOV, AVI) up to 100MB. Our Gemini 2.5 Flash AI will extract and analyze all audio content.</p>
+                  <h4 className="font-semibold text-sm xs:text-base mb-1">Upload Your File</h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Upload any video (MP4, MOV, AVI) or audio file (MP3, WAV, M4A) up to 100MB. Our Gemini 2.5 Flash AI will extract and analyze all audio content.</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
@@ -334,9 +339,9 @@ export default function TranscriptionPage() {
         {/* Simple Paragraph About the Tool */}
         <Card className="shadow-lg bg-white dark:bg-gray-800 mb-6 xs:mb-8 mx-1 xs:mx-2 sm:mx-0 rounded-lg">
           <CardContent className="p-4 xs:p-5">
-            <h3 className="text-lg xs:text-xl font-bold mb-3 xs:mb-4 text-orange-600">About Video to Text</h3>
+            <h3 className="text-lg xs:text-xl font-bold mb-3 xs:mb-4 text-orange-600">About Audio/Video to Text</h3>
             <p className="text-sm xs:text-base text-gray-700 dark:text-gray-300 leading-relaxed">
-              Our Video to Text tool is a powerful AI-powered solution that extracts and converts audio from your videos into accurate text transcriptions using Gemini 2.5 Flash. Supporting multiple languages with automatic detection, this tool is perfect for content creators, businesses, educators, and anyone who needs to convert video content into searchable, accessible text. The transcription includes timestamps, speaker identification, and audio analysis for comprehensive results.
+              Our Audio/Video to Text tool is a powerful AI-powered solution that extracts and converts audio from your videos and audio files into accurate text transcriptions using Gemini 2.5 Flash. Supporting multiple languages with automatic detection, this tool is perfect for content creators, businesses, educators, and anyone who needs to convert audio content into searchable, accessible text. The transcription includes timestamps, speaker identification, and audio analysis for comprehensive results.
             </p>
           </CardContent>
         </Card>

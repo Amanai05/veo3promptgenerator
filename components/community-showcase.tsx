@@ -80,7 +80,7 @@ export function CommunityShowcase() {
             <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">Showcase</span>
           </h2>
           <p className="text-sm text-muted-foreground max-w-2xl mx-auto">
-            Discover amazing videos created by our community using VeO3 prompts and tools.
+            Discover amazing videos created by our community using Veo3 prompts and tools.
           </p>
         </div>
 

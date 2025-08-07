@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next"
 
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = "https://veo3promptgenerator.com"
+  const baseUrl = "https://veo3promptgenerator.online"
 
   return {
     rules: [

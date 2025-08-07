@@ -3,6 +3,55 @@ import Image from "next/image"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { CalendarDays, User, Clock } from "lucide-react"
+import { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "Veo3 Blog - AI Video Generation Tips, Tutorials & Industry Insights",
+  description: "Discover expert tips, tutorials, and insights on AI video generation, Veo3 prompts, content creation, and the latest trends in digital media. Stay ahead with our comprehensive guides.",
+  keywords: "Veo3 blog, AI video generation tips, prompt engineering tutorials, content creation guides, video marketing insights, AI video trends, digital media blog, content creator resources, video production tips, AI tools blog, Veo3 tutorials, video content strategy",
+  authors: [{ name: "Veo3 Prompt Generator Team" }],
+  creator: "Veo3 Prompt Generator",
+  publisher: "Veo3 Prompt Generator",
+  metadataBase: new URL("https://veo3promptgenerator.online"),
+  alternates: {
+    canonical: "/blog",
+  },
+  openGraph: {
+    title: "Veo3 Blog - AI Video Generation Tips, Tutorials & Industry Insights",
+    description: "Discover expert tips, tutorials, and insights on AI video generation, Veo3 prompts, content creation, and the latest trends in digital media.",
+    url: "https://veo3promptgenerator.online/blog",
+    siteName: "Veo3 Prompt Generator",
+    images: [
+      {
+        url: "/images/og-image-1200x630.png",
+        width: 1200,
+        height: 630,
+        alt: "Veo3 Blog - AI Video Generation Tips & Tutorials",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Veo3 Blog - AI Video Generation Tips, Tutorials & Industry Insights",
+    description: "Discover expert tips, tutorials, and insights on AI video generation, Veo3 prompts, content creation, and the latest trends in digital media.",
+    images: ["/images/og-image-1200x630.png"],
+    creator: "@veo3promptgen",
+    site: "@veo3promptgen",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+}
 
 const blogPosts = [
   {
@@ -68,7 +117,7 @@ export default function BlogPage() {
       <section className="py-16 bg-gradient-to-br from-background to-muted/20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl sm:text-5xl font-bold mb-4">
-            VeO3 <span className="text-primary">Blog</span>
+            Veo3 <span className="text-primary">Blog</span>
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Insights, tutorials, and best practices for AI video generation, prompt engineering, and content creation.

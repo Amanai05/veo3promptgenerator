@@ -1,3 +1,53 @@
+import { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "Privacy Policy - Veo3 Prompt Generator | Data Protection & Security",
+  description: "Learn how Veo3 Prompt Generator protects your privacy and data. Our comprehensive privacy policy explains how we collect, use, and safeguard your information.",
+  keywords: "privacy policy, data protection, Veo3 Prompt Generator privacy, user data security, GDPR compliance, data privacy, information security, user privacy, data collection policy, privacy protection, secure data handling",
+  authors: [{ name: "Veo3 Prompt Generator Team" }],
+  creator: "Veo3 Prompt Generator",
+  publisher: "Veo3 Prompt Generator",
+  metadataBase: new URL("https://veo3promptgenerator.online"),
+  alternates: {
+    canonical: "/privacy",
+  },
+  openGraph: {
+    title: "Privacy Policy - Veo3 Prompt Generator | Data Protection & Security",
+    description: "Learn how Veo3 Prompt Generator protects your privacy and data. Our comprehensive privacy policy explains how we collect, use, and safeguard your information.",
+    url: "https://veo3promptgenerator.online/privacy",
+    siteName: "Veo3 Prompt Generator",
+    images: [
+      {
+        url: "/images/og-image-1200x630.png",
+        width: 1200,
+        height: 630,
+        alt: "Privacy Policy - Veo3 Prompt Generator",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Privacy Policy - Veo3 Prompt Generator | Data Protection & Security",
+    description: "Learn how Veo3 Prompt Generator protects your privacy and data. Our comprehensive privacy policy explains how we collect, use, and safeguard your information.",
+    images: ["/images/og-image-1200x630.png"],
+    creator: "@veo3promptgen",
+    site: "@veo3promptgen",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+}
+
 export default function PrivacyPage() {
   return (
     <main>
@@ -17,7 +67,7 @@ export default function PrivacyPage() {
               <section>
                 <h2 className="text-2xl font-bold mb-4">Introduction</h2>
                 <p className="text-muted-foreground leading-relaxed">
-                  At VeO3 Prompt Generator, we take your privacy seriously. This Privacy Policy explains how we collect,
+                  At Veo3 Prompt Generator, we take your privacy seriously. This Privacy Policy explains how we collect,
                   use, disclose, and safeguard your information when you visit our website and use our services. Please
                   read this privacy policy carefully. If you do not agree with the terms of this privacy policy, please
                   do not access the site.
@@ -154,7 +204,7 @@ export default function PrivacyPage() {
                   If you have any questions about this Privacy Policy or our data practices, please contact us at:
                 </p>
                 <div className="bg-muted rounded-lg p-4">
-                  <p className="font-medium">Email: privacy@veo3promgenerator.com</p>
+                                      <p className="font-medium">Email: veo3promptgenerator.online@gmail.com</p>
                   <p className="font-medium">Address: 123 Innovation Drive, San Francisco, CA 94105</p>
                   <p className="font-medium">Phone: +1 (555) 123-4567</p>
                 </div>

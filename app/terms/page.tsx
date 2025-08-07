@@ -1,3 +1,53 @@
+import { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "Terms of Service - Veo3 Prompt Generator | User Agreement & Legal Terms",
+  description: "Read our terms of service for Veo3 Prompt Generator. Understand your rights and responsibilities when using our AI video prompt generation tools and services.",
+  keywords: "terms of service, user agreement, Veo3 Prompt Generator terms, legal terms, service agreement, user rights, service conditions, legal policy, user responsibilities, service usage terms, legal compliance",
+  authors: [{ name: "Veo3 Prompt Generator Team" }],
+  creator: "Veo3 Prompt Generator",
+  publisher: "Veo3 Prompt Generator",
+  metadataBase: new URL("https://veo3promptgenerator.online"),
+  alternates: {
+    canonical: "/terms",
+  },
+  openGraph: {
+    title: "Terms of Service - Veo3 Prompt Generator | User Agreement & Legal Terms",
+    description: "Read our terms of service for Veo3 Prompt Generator. Understand your rights and responsibilities when using our AI video prompt generation tools and services.",
+    url: "https://veo3promptgenerator.online/terms",
+    siteName: "Veo3 Prompt Generator",
+    images: [
+      {
+        url: "/images/og-image-1200x630.png",
+        width: 1200,
+        height: 630,
+        alt: "Terms of Service - Veo3 Prompt Generator",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Terms of Service - Veo3 Prompt Generator | User Agreement & Legal Terms",
+    description: "Read our terms of service for Veo3 Prompt Generator. Understand your rights and responsibilities when using our AI video prompt generation tools and services.",
+    images: ["/images/og-image-1200x630.png"],
+    creator: "@veo3promptgen",
+    site: "@veo3promptgen",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+}
+
 export default function TermsPage() {
   return (
     <main>
@@ -17,7 +67,7 @@ export default function TermsPage() {
               <section>
                 <h2 className="text-2xl font-bold mb-4">Agreement to Terms</h2>
                 <p className="text-muted-foreground leading-relaxed">
-                  By accessing and using VeO3 Prompt Generator ("Service"), you accept and agree to be bound by the
+                  By accessing and using Veo3 Prompt Generator ("Service"), you accept and agree to be bound by the
                   terms and provision of this agreement. If you do not agree to abide by the above, please do not use
                   this service.
                 </p>
@@ -26,7 +76,7 @@ export default function TermsPage() {
               <section>
                 <h2 className="text-2xl font-bold mb-4">Use License</h2>
                 <p className="text-muted-foreground mb-4">
-                  Permission is granted to temporarily use VeO3 Prompt Generator for personal and commercial purposes.
+                  Permission is granted to temporarily use Veo3 Prompt Generator for personal and commercial purposes.
                   This is the grant of a license, not a transfer of title, and under this license you may:
                 </p>
                 <ul className="list-disc list-inside text-muted-foreground space-y-1">
@@ -37,7 +87,7 @@ export default function TermsPage() {
                 </ul>
                 <p className="text-muted-foreground mt-4">
                   This license shall automatically terminate if you violate any of these restrictions and may be
-                  terminated by VeO3 Prompt Generator at any time.
+                  terminated by Veo3 Prompt Generator at any time.
                 </p>
               </section>
 
@@ -77,7 +127,7 @@ export default function TermsPage() {
                   <div>
                     <h3 className="text-xl font-semibold mb-2">Our Intellectual Property</h3>
                     <p className="text-muted-foreground">
-                      The VeO3 Prompt Generator service, including its design, functionality, and underlying technology,
+                      The Veo3 Prompt Generator service, including its design, functionality, and underlying technology,
                       is protected by copyright, trademark, and other intellectual property laws.
                     </p>
                   </div>
@@ -97,7 +147,7 @@ export default function TermsPage() {
               <section>
                 <h2 className="text-2xl font-bold mb-4">Limitation of Liability</h2>
                 <p className="text-muted-foreground">
-                  To the maximum extent permitted by applicable law, VeO3 Prompt Generator shall not be liable for any
+                  To the maximum extent permitted by applicable law, Veo3 Prompt Generator shall not be liable for any
                   indirect, incidental, special, consequential, or punitive damages, or any loss of profits or revenues,
                   whether incurred directly or indirectly, or any loss of data, use, goodwill, or other intangible
                   losses, resulting from your use of our service.
@@ -144,7 +194,7 @@ export default function TermsPage() {
                   If you have any questions about these Terms of Service, please contact us at:
                 </p>
                 <div className="bg-muted rounded-lg p-4">
-                  <p className="font-medium">Email: legal@veo3promgenerator.com</p>
+                                      <p className="font-medium">Email: veo3promptgenerator.online@gmail.com</p>
                   <p className="font-medium">Address: 123 Innovation Drive, San Francisco, CA 94105</p>
                   <p className="font-medium">Phone: +1 (555) 123-4567</p>
                 </div>

@@ -62,7 +62,7 @@ export class BaseAIService {
     }
   }
 
-  protected async tryWithRobustFallback(prompt: string): Promise<{ result: string; metadata: AIMetadata }> {
+  protected async tryWithRobustFallback(prompt: string, videoData?: string): Promise<{ result: string; metadata: AIMetadata }> {
     const startTime = Date.now();
     let lastError: Error | null = null;
 
@@ -71,7 +71,9 @@ export class BaseAIService {
       const apiConfig = this.geminiAPIs[i];
       try {
         console.log(`Attempting ${apiConfig.name}...`);
-        const result = await this.callGeminiAPI(apiConfig.apiKey, prompt);
+        const result = videoData 
+          ? await this.callGeminiAPIWithVideo(apiConfig.apiKey, prompt, videoData)
+          : await this.callGeminiAPI(apiConfig.apiKey, prompt);
         
         return {
           result,
@@ -90,7 +92,9 @@ export class BaseAIService {
         if (i === this.geminiAPIs.length - 1 && this.openRouterAPI) {
           try {
             console.log("All Gemini APIs failed, trying OpenRouter...");
-            const result = await this.callOpenRouterAPI(this.openRouterAPI.apiKey, prompt);
+            const result = videoData
+              ? await this.callOpenRouterAPIWithVideo(this.openRouterAPI.apiKey, prompt, videoData)
+              : await this.callOpenRouterAPI(this.openRouterAPI.apiKey, prompt);
             
             return {
               result,
@@ -157,6 +161,86 @@ export class BaseAIService {
         body: JSON.stringify({
         model: "google/gemini-2.5-pro",
         messages: [{ role: "user", content: prompt }],
+        max_tokens: 2048,
+          temperature: 0.7,
+      }),
+    });
+
+      if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`OpenRouter API error: ${response.status} - ${errorText}`);
+    }
+
+    const data = await response.json();
+    const result = data.choices[0]?.message?.content || "";
+    
+    if (!result) {
+      throw new Error("Empty response from OpenRouter API");
+    }
+
+    return result;
+  }
+
+  private async callGeminiAPIWithVideo(apiKey: string, prompt: string, videoData: string): Promise<string> {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=${apiKey}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+        contents: [{ 
+          parts: [
+            { text: prompt },
+            { 
+              inlineData: {
+                mimeType: "video/mp4",
+                data: videoData
+              }
+            }
+          ] 
+        }],
+        generationConfig: {
+          temperature: 0.8,
+          topK: 40,
+          topP: 0.95,
+          maxOutputTokens: 2048,
+        },
+      }),
+    });
+
+      if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Gemini API error: ${response.status} - ${errorText}`);
+    }
+
+    const data = await response.json();
+    const result = data.candidates[0]?.content?.parts[0]?.text || "";
+    
+    if (!result) {
+      throw new Error("Empty response from Gemini API");
+    }
+
+    return result;
+  }
+
+  private async callOpenRouterAPIWithVideo(apiKey: string, prompt: string, videoData: string): Promise<string> {
+    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+        "Authorization": `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+        "HTTP-Referer": process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
+        "X-Title": "veo3promptgenerator",
+        },
+        body: JSON.stringify({
+        model: "google/gemini-2.5-pro",
+        messages: [{ 
+          role: "user", 
+          content: [
+            { type: "text", text: prompt },
+            { type: "image_url", image_url: { url: `data:video/mp4;base64,${videoData}` } }
+          ]
+        }],
         max_tokens: 2048,
           temperature: 0.7,
       }),

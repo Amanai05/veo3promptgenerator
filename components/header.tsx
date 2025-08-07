@@ -58,7 +58,7 @@ export function Header() {
           <Link href="/" className="flex items-center space-x-2">
             <Image 
               src="/images/veo3-logo-new.png" 
-              alt="VeO3" 
+                                  alt="Veo3" 
               width={120} 
               height={40} 
               className="h-6 w-auto xs:h-8 sm:h-10" 

@@ -420,7 +420,7 @@ export default function Veo3PromptGeneratorPage() {
             "@type": "SoftwareApplication",
             "name": "Free Veo3 Prompt Generator",
             "description": "Generate production-ready prompts for Google's Veo3. Our free tool creates advanced JSON & paragraph prompts with viral templates and full cinematic control. No signup required.",
-            "url": "https://veo3promptgenerator.com/veo3-prompt-generator",
+            "url": "https://veo3promptgenerator.online/veo3-prompt-generator",
             "applicationCategory": "MultimediaApplication",
             "operatingSystem": "Web Browser",
             "offers": {
@@ -440,7 +440,7 @@ export default function Veo3PromptGeneratorPage() {
               "No signup required",
               "Free to use"
             ],
-            "screenshot": "https://veo3promptgenerator.com/images/screenshot-desktop.png",
+            "screenshot": "https://veo3promptgenerator.online/images/screenshot-desktop.png",
             "softwareVersion": "1.0",
             "aggregateRating": {
               "@type": "AggregateRating",
